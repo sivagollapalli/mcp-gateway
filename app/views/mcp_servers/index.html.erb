@@ -1,0 +1,19 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">MCP Servers</h1>
+  <%= link_to "Add server", new_mcp_server_path, class: "btn btn-primary" %>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Name</th><th>URL</th><th>Status</th><th>Tools</th><th>Enabled</th><th>Last checked</th><th></th></tr></thead>
+      <tbody>
+        <% @servers.each do |server| %>
+          <%= render "row", server: server %>
+        <% end %>
+        <% if @servers.empty? %>
+          <tr><td colspan="7" class="text-center text-secondary py-4">No servers yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<%= turbo_stream.update "flash" do %>
+  <% { notice: "success", alert: "danger" }.each do |key, style| %>
+    <% if flash.now[key].present? %><div class="alert alert-<%= style %> alert-dismissible fade show"><%= flash.now[key] %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><% end %>
+  <% end %>
+<% end %>
+<%= turbo_stream.replace dom_id(@server, :row), partial: "mcp_servers/row", locals: { server: @server } %>
+<%= turbo_stream.replace dom_id(@server, :status), partial: "mcp_servers/status", locals: { server: @server } %>
+<%= turbo_stream.replace dom_id(@server, :tools), partial: "mcp_servers/tools", locals: { server: @server, disabled: @disabled } %>

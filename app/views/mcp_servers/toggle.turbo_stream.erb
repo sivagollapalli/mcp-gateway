@@ -1,0 +1,2 @@
+<%= turbo_stream.replace dom_id(@server, :row), partial: "mcp_servers/row", locals: { server: @server } %>
+<%= turbo_stream.replace dom_id(@server, :status), partial: "mcp_servers/status", locals: { server: @server } %>

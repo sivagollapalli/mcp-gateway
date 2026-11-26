@@ -1,0 +1,20 @@
+<tr id="<%= dom_id(server, :row) %>">
+  <td><%= link_to server.name, server, class: "fw-semibold" %></td>
+  <td class="text-break small"><%= server.url %></td>
+  <td>
+    <%= status_badge(server.last_status) %>
+    <% if server.last_error.present? %><div class="small text-danger"><%= truncate(server.last_error, length: 80) %></div><% end %>
+  </td>
+  <td><%= server.tools_count %></td>
+  <td>
+    <%= button_to toggle_mcp_server_path(server), method: :patch, class: "btn btn-sm p-0 border-0", form: { class: "d-inline" } do %>
+      <span class="form-check form-switch m-0 d-inline-block"><input class="form-check-input" type="checkbox" role="switch" <%= "checked" if server.enabled? %> disabled aria-label="Toggle <%= server.name %>"></span>
+    <% end %>
+  </td>
+  <td class="text-nowrap small"><%= time_ago_or_dash(server.last_checked_at) %></td>
+  <td class="text-end text-nowrap">
+    <%= button_to "Test / Refresh", refresh_mcp_server_path(server), class: "btn btn-sm btn-outline-primary", form: { class: "d-inline" }, data: { turbo_submits_with: "Testing…" } %>
+    <%= link_to "Edit", edit_mcp_server_path(server), class: "btn btn-sm btn-outline-secondary" %>
+    <%= button_to "Delete", server, method: :delete, class: "btn btn-sm btn-outline-danger", form: { class: "d-inline", data: { turbo_confirm: "Delete #{server.name}?" } } %>
+  </td>
+</tr>

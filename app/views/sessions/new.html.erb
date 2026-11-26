@@ -1,0 +1,16 @@
+<div class="card shadow-sm">
+  <div class="card-body p-4">
+    <h1 class="h4 mb-3">MCP Gateway</h1>
+    <%= form_with url: session_path do |f| %>
+      <div class="mb-3">
+        <%= f.label :email, class: "form-label" %>
+        <%= f.email_field :email, class: "form-control", required: true, autofocus: true, autocomplete: "username" %>
+      </div>
+      <div class="mb-3">
+        <%= f.label :password, class: "form-label" %>
+        <%= f.password_field :password, class: "form-control", required: true, autocomplete: "current-password" %>
+      </div>
+      <%= f.submit "Sign in", class: "btn btn-primary w-100" %>
+    <% end %>
+  </div>
+</div>

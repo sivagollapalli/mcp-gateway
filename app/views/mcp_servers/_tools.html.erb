@@ -1,0 +1,12 @@
+<div id="<%= dom_id(server, :tools) %>" class="card shadow-sm">
+  <div class="card-header">Discovered tools (<%= server.tools_count %>)</div>
+  <% if server.tools.empty? %>
+    <div class="card-body text-secondary">No tools discovered yet. Use “Test connection / Refresh tools”.</div>
+  <% else %>
+    <ul class="list-group list-group-flush">
+      <% server.tools.each do |tool| %>
+        <%= render "tool", server: server, tool: tool, enabled: !disabled.include?(tool["name"]) %>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

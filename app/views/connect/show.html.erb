@@ -1,0 +1,20 @@
+<% token = "<TOKEN>" %>
+<% cli = %(claude mcp add --transport http my-gateway #{@mcp_url} --header "Authorization: Bearer #{token}") %>
+<% json = JSON.pretty_generate(mcpServers: { "my-gateway" => { type: "http", url: @mcp_url, headers: { "Authorization" => "Bearer #{token}" } } }) %>
+<h1 class="h3 mb-3">Connect Claude Code</h1>
+<p>Replace <code>&lt;TOKEN&gt;</code> with a <%= link_to "gateway token", gateway_tokens_path %>. Tokens are shown only once, at creation.
+<% if @tokens.empty? %><%= link_to "Create one now.", new_gateway_token_path %><% end %></p>
+
+<div class="card shadow-sm mb-3"><div class="card-body" data-controller="clipboard">
+  <div class="d-flex justify-content-between"><h2 class="h6">Command line</h2>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-action="clipboard#copy" data-clipboard-target="button">Copy</button></div>
+  <pre class="bg-body-secondary p-2 rounded mb-0 text-break" style="white-space: pre-wrap;" data-clipboard-target="source"><%= cli %></pre>
+</div></div>
+
+<div class="card shadow-sm mb-3"><div class="card-body" data-controller="clipboard">
+  <div class="d-flex justify-content-between"><h2 class="h6"><code>.mcp.json</code></h2>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-action="clipboard#copy" data-clipboard-target="button">Copy</button></div>
+  <pre class="bg-body-secondary p-2 rounded mb-0" data-clipboard-target="source"><%= json %></pre>
+</div></div>
+
+<p class="text-secondary">Then run <code>/mcp</code> inside Claude Code to verify the connection. Endpoint: <code><%= @mcp_url %></code></p>

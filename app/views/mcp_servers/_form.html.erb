@@ -1,0 +1,42 @@
+<%= form_with model: server do |f| %>
+  <% if server.errors.any? %>
+    <div class="alert alert-danger"><ul class="mb-0">
+      <% server.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
+    </ul></div>
+  <% end %>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <%= f.label :name, class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", required: true, pattern: "[a-z0-9_]+", maxlength: 32, aria: { describedby: "name-help" } %>
+      <div id="name-help" class="form-text">Lowercase letters, digits, underscores (no “__”). Used as the tool-name prefix: <code>name__tool</code>.</div>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :url, "Upstream MCP URL", class: "form-label" %>
+      <%= f.url_field :url, class: "form-control", required: true, placeholder: "https://example.com/mcp" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :auth_type, "Authentication", class: "form-label" %>
+      <%= f.select :auth_type, McpServer::AUTH_TYPES.map { |t| [t, t] }, {}, class: "form-select" %>
+    </div>
+    <div class="col-md-8">
+      <%= f.label :auth_token, "Secret", class: "form-label" %>
+      <%= f.password_field :auth_token, class: "form-control", value: "", autocomplete: "off",
+            placeholder: (server.persisted? && server.auth_token.present? ? "•••••• (leave blank to keep)" : "") %>
+      <div class="form-text">For <code>bearer</code>: the token. For <code>header</code>: a full <code>Header-Name: value</code> pair. Stored encrypted.</div>
+    </div>
+    <div class="col-12">
+      <%= f.label :description, class: "form-label" %>
+      <%= f.text_area :description, rows: 2, class: "form-control" %>
+    </div>
+    <div class="col-12">
+      <div class="form-check form-switch">
+        <%= f.check_box :enabled, class: "form-check-input", role: "switch" %>
+        <%= f.label :enabled, class: "form-check-label" %>
+      </div>
+    </div>
+  </div>
+  <div class="mt-4">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", mcp_servers_path, class: "btn btn-link" %>
+  </div>
+<% end %>

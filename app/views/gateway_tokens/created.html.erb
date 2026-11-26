@@ -1,0 +1,10 @@
+<h1 class="h3 mb-3">Token “<%= @token.name %>” created</h1>
+<div class="alert alert-warning">Copy this token now. It is shown only once and cannot be retrieved later.</div>
+<div class="card shadow-sm mb-3"><div class="card-body" data-controller="clipboard">
+  <div class="input-group">
+    <input type="text" readonly class="form-control font-monospace" value="<%= @plaintext %>" data-clipboard-target="source">
+    <button type="button" class="btn btn-outline-primary" data-action="clipboard#copy" data-clipboard-target="button">Copy</button>
+  </div>
+</div></div>
+<%= link_to "Connect instructions", connect_path, class: "btn btn-primary" %>
+<%= link_to "Back to tokens", gateway_tokens_path, class: "btn btn-link" %>

@@ -1,0 +1,1 @@
+<%= turbo_stream.replace tool_dom_id(@server, @tool["name"]), partial: "mcp_servers/tool", locals: { server: @server, tool: @tool, enabled: @enabled } %>

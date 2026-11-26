@@ -1,0 +1,37 @@
+ <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "MCP Gateway" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= render "shared/head_assets" %>
+  </head>
+  <body class="bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+      <div class="container">
+        <%= link_to "MCP Gateway", root_path, class: "navbar-brand" %>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+          <div class="navbar-nav me-auto">
+            <%= nav_link "Dashboard", root_path %>
+            <%= nav_link "Servers", mcp_servers_path %>
+            <%= nav_link "Tokens", gateway_tokens_path %>
+            <%= nav_link "Call logs", call_logs_path %>
+            <%= nav_link "Connect", connect_path %>
+          </div>
+          <% if current_user %>
+            <span class="navbar-text me-3"><%= current_user.email %></span>
+            <%= button_to "Sign out", session_path, method: :delete, class: "btn btn-outline-light btn-sm" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+    <main class="container pb-5">
+      <%= render "shared/flash" %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<h1 class="h3 mb-4">Dashboard</h1>
+<div class="row g-3 mb-4">
+  <% [["Servers", "#{@enabled_servers} / #{@servers_count}", "enabled / total", mcp_servers_path],
+      ["Tools", @tools_count, "from enabled servers", mcp_servers_path],
+      ["Calls (24h)", @calls_24h, "#{@errors_24h} errors", call_logs_path]].each do |label, value, sub, path| %>
+    <div class="col-12 col-md-4">
+      <%= link_to path, class: "text-decoration-none" do %>
+        <div class="card shadow-sm h-100"><div class="card-body">
+          <div class="text-secondary small"><%= label %></div>
+          <div class="display-6 text-body"><%= value %></div>
+          <div class="text-secondary small"><%= sub %></div>
+        </div></div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<% if @failing_servers.any? %>
+  <div class="alert alert-warning">
+    <strong>Servers with errors:</strong>
+    <%= safe_join(@failing_servers.map { |s| link_to(s.name, s) }, ", ") %>
+  </div>
+<% end %>
+
+<div class="card shadow-sm">
+  <div class="card-header">Recent errors</div>
+  <% if @recent_errors.empty? %>
+    <div class="card-body text-secondary">No errors recorded.</div>
+  <% else %>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead><tr><th>When</th><th>Server</th><th>Tool</th><th>Error</th></tr></thead>
+        <tbody>
+          <% @recent_errors.each do |log| %>
+            <tr>
+              <td class="text-nowrap"><%= time_ago_or_dash(log.created_at) %></td>
+              <td><%= log.mcp_server&.name || "—" %></td>
+              <td><code><%= log.tool_name %></code></td>
+              <td class="text-danger"><%= log.error %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

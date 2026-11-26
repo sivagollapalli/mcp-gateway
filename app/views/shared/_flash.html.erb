@@ -1,0 +1,10 @@
+<div id="flash">
+  <% { notice: "success", alert: "danger" }.each do |key, style| %>
+    <% if flash[key].present? %>
+      <div class="alert alert-<%= style %> alert-dismissible fade show" role="alert">
+        <%= flash[key] %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+  <% end %>
+</div>

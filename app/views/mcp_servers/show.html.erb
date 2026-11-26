@@ -1,0 +1,13 @@
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-1"><%= @server.name %></h1>
+    <div class="text-secondary text-break"><%= @server.url %></div>
+    <% if @server.description.present? %><div class="mt-1"><%= @server.description %></div><% end %>
+  </div>
+  <div class="d-flex gap-2">
+    <%= button_to "Test connection / Refresh tools", refresh_mcp_server_path(@server), class: "btn btn-primary", data: { turbo_submits_with: "Testing…" } %>
+    <%= link_to "Edit", edit_mcp_server_path(@server), class: "btn btn-outline-secondary" %>
+  </div>
+</div>
+<%= render "status", server: @server %>
+<%= render "tools", server: @server, disabled: @disabled %>
