@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Runs every test suite: the gateway (Rails) and the sample MCP servers' token validation.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+# Tests must not pick up a developer's OIDC / exchange settings.
+unset KEYCLOAK_ISSUER GATEWAY_CLIENT_SECRET GATEWAY_CLIENT_ID DATABASE_URL
+echo "== gateway"
+bin/rails test
+echo "== mcp_servers"
+(cd mcp_servers && bundle exec ruby -Itest -e 'Dir["test/*_test.rb"].sort.each { require_relative _1 }')

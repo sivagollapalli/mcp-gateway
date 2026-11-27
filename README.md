@@ -112,7 +112,8 @@ Setting `KEYCLOAK_ISSUER` switches `/mcp` from static gateway tokens to **OAuth 
 
 ### Run it
 ```sh
-docker compose up --build      # Keycloak on :8080 (realm `mcp` imported), gateway on :8081
+cp .env.example .env           # then set GATEWAY_CLIENT_SECRET=$(openssl rand -hex 32)
+docker compose up --build      # Keycloak :8080 (realm `mcp`), gateway :8081, orders :9301, payments :9302
 claude mcp add --transport http mcp-gateway http://localhost:8081/mcp
 ```
 Then in Claude Code run `/mcp`, pick `mcp-gateway`, choose **Login**. The browser opens Keycloak; sign in as `test-user` / `test-password`, accept the consent screen, and call the `whoami` tool: it returns your `sub` and granted scopes.
@@ -147,7 +148,7 @@ Keycloak admin console: http://localhost:8080 (`admin` / `admin`, dev only). If 
 * No call to Keycloak happens per request (no introspection or userinfo). The only network calls are boot and the rate-limited refetch on an unknown `kid`. Tokens are never forwarded upstream.
 
 ### Keycloak realm (`keycloak/realm-mcp.json`)
-Realm `mcp`; issuer `http://localhost:8080/realms/mcp` (pinned in compose with `KC_HOSTNAME`). Access tokens are RS256 with a 10 minute lifetime. Client scope `mcp-api` (realm default scope) has the audience mapper for `mcp-gateway`. `mcp:read` and `mcp:tools:execute` are realm *optional* scopes. Client policy `enforce-pkce-public-clients` applies the `pkce-enforcer` executor (auto-configure, S256) to every public client, which includes anonymously registered ones. Test user: `test-user` / `test-password`, with the realm's default roles. Claude Code requests `offline_access` (Keycloak advertises it), and the token exchange fails with "Offline tokens not allowed" if the user lacks that role.
+Realm `mcp`; issuer `http://localhost:8080/realms/mcp` (pinned in compose with `KC_HOSTNAME`). Access tokens are RS256 with a 10 minute lifetime. Client scope `mcp-api` (realm default scope) has the audience mapper for `mcp-gateway`. `mcp:read` and `mcp:tools:execute` are realm *optional* scopes. Client policy `enforce-pkce-public-clients` applies the `pkce-enforcer` executor (auto-configure, S256) to every public client, which includes anonymously registered ones. Test user: `test-user` / `test-password`, with the realm's default roles. Claude Code requests `offline_access` (Keycloak advertises it), and the authorization-code-to-token step fails with "Offline tokens not allowed" if the user lacks that role.
 
 Dynamic Client Registration is **anonymous** for development (Trusted Hosts restricts redirect URIs to `localhost` / `127.0.0.1`, Consent Required is on). **For production switch to initial access tokens**: remove the `subType: anonymous` policies, create an initial access token in *Clients > Initial access token*, and give it to whoever registers clients. Also replace the dev admin password, set `sslRequired` to `external` or `all`, use HTTPS issuers, and set a real `SECRET_KEY_BASE`.
 
@@ -167,4 +168,104 @@ Dynamic Client Registration is **anonymous** for development (Trusted Hosts rest
 * **Compose ports** can be overridden (`KEYCLOAK_PORT`, `GATEWAY_PORT`); the defaults are the ones in the spec (8080, 8081).
 * The gateway runs the production image, so `docker compose` uses an insecure development `SECRET_KEY_BASE` unless you set one.
 * **Verified**: Claude Code `/mcp` → Authenticate → browser login → `whoami` returns `sub` and scopes, against Keycloak 26.4.7 under `docker compose`. `script/oidc_e2e.py` covers the same flow without a browser.
-* Out of scope and not built: gateway→upstream client credentials, token exchange, policy engine beyond scopes, new rate limiting, multi-tenancy, session resumption.
+* Out of scope for this phase: policy engine beyond scopes, new rate limiting, multi-tenancy, session resumption. Token exchange to upstreams was added later (next section).
+
+## Token exchange to upstream MCP servers (RFC 8693)
+Upstreams registered with Authentication **`token_exchange`** never see the user's token. For every `tools/call` the gateway exchanges the caller's validated Keycloak token for a short-lived token whose `aud` is exactly that server's audience and whose `scope` is the tool's scope, then forwards only that token. Each upstream validates the token again itself.
+
+```
+Claude Code --(user JWT, aud=mcp-gateway)--> gateway /mcp
+   gateway: validate JWT (iss, aud, exp/nbf, signature) -> tool scope check (403 if missing)
+   gateway --(subject_token=user JWT, audience=mcp-orders, scope="mcp-orders-audience orders:read")--> Keycloak token endpoint
+   gateway: check issued token (iss, aud == [mcp-orders], exp, scope) -> cache
+   gateway --(Authorization: Bearer <exchanged JWT>)--> orders server: validate again (JWKS, iss, aud == mcp-orders, per-tool scope)
+```
+
+### Registering a server (the "route table")
+Routing is per tool: the gateway already routes `orders__get_order` to the `orders` server. Each server row is a route entry, configured in **Servers → New / Edit**:
+
+| Field | Example | Meaning |
+|---|---|---|
+| Authentication | `token_exchange` | Turns exchange on for this server |
+| Token exchange server (OIDC issuer) | blank → `KEYCLOAK_ISSUER` | Token endpoint is discovered from `<issuer>/.well-known/openid-configuration` and the discovered `issuer` must match exactly |
+| Client ID / Client secret | blank → `GATEWAY_CLIENT_ID` / `GATEWAY_CLIENT_SECRET` | Confidential client that performs the exchange (`client_secret_basic`). A secret typed here is stored encrypted |
+| Audience | `mcp-orders` | Sent as `audience`; the issued token must have exactly this `aud` |
+| Always-requested scopes | `mcp-orders-audience` | Added to every exchange. In Keycloak this is the client scope carrying the audience mapper |
+| Default tool scope | `orders:read` | Required for any tool without a per-tool entry (required, so unmapped tools fail closed) |
+| Per-tool scopes | `create_order=orders:write` | One `upstream_tool=scope` per line |
+
+The show page lists the required scope next to each tool. `docker compose` seeds `orders` and `payments` this way (`SEED_TOKEN_EXCHANGE_DEMO=1`, see `db/seeds.rb`).
+
+**Adding a third server** needs no gateway code: (1) in Keycloak add a bearer-only client `mcp-<name>`, a client scope `mcp-<name>-audience` with an Audience mapper to it, and the tool scopes; make the audience scope and tool scopes *optional* scopes of `mcp-gateway`, and the tool scopes realm optional scopes (so MCP clients can request them); (2) register the server in the UI with those values; (3) run the server with `OIDC_ISSUER`, `OIDC_AUDIENCE` and its own tool→scope map.
+
+### What the gateway checks
+1. **Inbound** (unchanged from the OIDC section): signature against the cached JWKS, `iss`, `aud` contains `mcp-gateway`, `exp`/`nbf`, then scopes. For `tools/call` on a token-exchange server the token must also contain the tool's scope; otherwise **403** `insufficient_scope` naming the scope, before anything is exchanged.
+2. **Exchange**: `POST` to the discovered token endpoint with `grant_type=urn:ietf:params:oauth:grant-type:token-exchange`, `subject_token`, `subject_token_type` and `requested_token_type` = `urn:ietf:params:oauth:token-type:access_token`, `audience`, `scope`. A non-200 response raises `TokenExchange::ExchangeFailed` (HTTP status + OAuth `error` code). The Keycloak error body is logged at debug level only.
+3. **Outbound** before forwarding: `token_type` is Bearer, `issued_token_type` is an access token, the JWT `alg` is RS256, `iss` equals the discovered issuer, `aud` is exactly `[audience]`, `exp` is in the future, `sub` present, and every requested scope is in `scope`. Any failure: the tool is not called and the client gets an `isError` result.
+4. **Forward**: upstream headers are built from scratch. The inbound `Authorization` header and any client headers are never copied; only `Authorization: Bearer <exchanged token>` is sent.
+5. **Cache**: a process-local memory store (never Rails.cache, so tokens never reach the database) keyed by SHA-256 over issuer, client, audience, scopes and SHA-256(inbound token). TTL is `min(expires_in - 30s, EXCHANGE_TTL)`. Tokens with less than 30 s left are not cached or reused.
+6. **Discovery** (`tools/list` in the background, when there is no user) uses a client-credentials token with only the always-requested scopes. That token has the right `aud` but no tool scope, so the upstream lets it list tools and rejects it for `tools/call`.
+
+Without OIDC mode (static gateway tokens) token-exchange servers fail closed: there is no user token to exchange.
+
+### Upstream validation (`mcp_servers/lib/jwt_auth.rb`)
+Enabled when `OIDC_ISSUER` is set (`OIDC_AUDIENCE` required, `OIDC_INTERNAL_URL` optional fetch origin, `ALLOWED_HOSTS` for the SDK's Host check). On boot the server fetches discovery and JWKS and refuses to start if they are unreachable. Per request: Bearer required, `alg` pinned to RS256, kid lookup with one rate-limited refetch on a miss, signature, `iss` exact, `aud` exactly the server's audience (so tokens for the gateway or the other server are 401), `exp`/`nbf` with 30 s leeway, `sub` present. For every `tools/call` (batches included) the tool must be in the server's own `TOOL_SCOPES` map and the token must carry that scope, otherwise 403. Gateway-supplied identity headers are ignored. Logs carry `sub` and `jti` only. Without `OIDC_ISSUER` the old `MCP_TOKEN` static bearer applies.
+
+### Keycloak configuration (in `keycloak/realm-mcp.json`)
+* **`mcp-gateway`**: confidential client, standard and direct-grant flows off, service account on, `standard.token.exchange.enabled=true`, access token lifespan **300 s**. Secret is `${GATEWAY_CLIENT_SECRET}`, which Keycloak substitutes from its environment at import, so no secret is committed. Default scope `basic`; optional scopes `mcp-orders-audience`, `mcp-payments-audience`, `orders:read`, `orders:write`, `payments:refund`.
+* **`mcp-orders`, `mcp-payments`**: bearer-only resource-server clients (no flows). They exist as audience targets.
+* **Client scopes**: `mcp-orders-audience` and `mcp-payments-audience` each hold one Audience mapper (included client audience). They are **not** realm default or optional scopes, so dynamically registered clients cannot request them (the anonymous Allowed Client Scopes policy rejects it). `orders:read`, `orders:write`, `payments:refund` are realm optional scopes with no mappers, so Claude Code can request them and they appear in `scope`.
+* The user-facing audience mapper `mcp-gateway` is unchanged from the OIDC section (it is on `mcp-api`, `mcp:read`, `mcp:tools:execute`), which satisfies Keycloak's requirement that the subject token's `aud` contains the requesting client.
+* To change the realm, edit the JSON and recreate Keycloak (`docker compose rm -sf keycloak && docker compose up -d keycloak`); start-dev keeps data in the container, and the import strategy skips an existing realm.
+
+### Walkthrough
+```sh
+cp .env.example .env && sed -i '' "s/^GATEWAY_CLIENT_SECRET=.*/GATEWAY_CLIENT_SECRET=$(openssl rand -hex 32)/" .env
+docker compose up -d --build --wait
+
+# 1. Log in as test-user (browserless: DCR + PKCE + login + consent) and keep the user token in a 0600 file
+TOKEN_OUT=/tmp/user.jwt python3 script/oidc_e2e.py http://localhost:8081 "mcp:read mcp:tools:execute orders:read"
+T=$(cat /tmp/user.jwt)
+
+# 2. Read through the gateway: exchanged to aud=mcp-orders, scope orders:read
+curl -s localhost:8081/mcp -H "Authorization: Bearer $T" -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"orders__get_order","arguments":{"order_id":"ORD-1001"}}}'
+
+# 3. Write without orders:write -> 403, WWW-Authenticate names the missing scope; nothing is exchanged
+curl -si localhost:8081/mcp -H "Authorization: Bearer $T" -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"orders__create_order","arguments":{"customer":"x","items":[{"sku":"a","qty":1,"price":1}]}}}' | grep -i www-authenticate
+
+# 4. The user token sent straight to the orders server is rejected (aud is mcp-gateway)
+curl -si localhost:9301/mcp -H "Authorization: Bearer $T" -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' -d '{"jsonrpc":"2.0","id":1,"method":"ping"}' | head -1
+
+# 5. Upstream log: exchanged tokens (jti ntrtte:...) with the user's sub; no token strings anywhere
+docker compose logs orders | grep jwt-auth
+```
+In Claude Code, run `/mcp` → Authenticate again after the realm changes. It requests the scopes listed in `/.well-known/oauth-protected-resource`, which now include the tool scopes.
+
+### Tests
+`bin/test-all` runs both suites: the gateway (exchange request format, typed errors and log hygiene, outbound `aud`/`iss`/`scope`/expiry checks, cache keying and TTL, inbound token never reaching the upstream, 403 before exchange, fail-closed paths, a second server with configuration only, the admin form) and the sample servers' validator (wrong `aud` including the gateway's and the other server's, wrong `iss`, expiry, bad signature and `alg`, kid refetch, per-tool and batch scope checks, ignored identity headers, log hygiene).
+
+### Verified against Keycloak 26.4.7 (this repo's compose)
+* Standard token exchange (v2) works with `standard.token.exchange.enabled` on the requesting client; no preview feature flag is needed (26.2+).
+* `audience=mcp-orders` alone fails with "Requested audience not available". The audience only becomes available when a requested scope carries an Audience mapper for it, hence `mcp-orders-audience` in every exchange.
+* The issued token has `aud: "mcp-orders"` (a single value; `mcp-gateway` is not included), `azp: mcp-gateway`, the user's `sub`, and `scope` exactly as requested.
+* **Keycloak does not down-scope to the subject token**: an exchange requesting `orders:write` succeeded for a user token that only had `orders:read`. The gateway's inbound per-tool scope check is therefore what limits the user; Keycloak only limits the gateway client.
+* **The lifetime comes from the requesting client** (`mcp-gateway`): with target lifespan 120 s and gateway 300 s the token lived 300 s; gateway 200 s gave 200 s. The `access.token.lifespan` on `mcp-orders` / `mcp-payments` has no effect on exchanged tokens; it is set to 300 anyway so the clients document the intent.
+* Dynamic client registration that asks for `mcp-orders-audience` is rejected; asking for `orders:read payments:refund` is accepted.
+* Keycloak also accepts a token issued *to* `mcp-gateway` (e.g. its own service-account token) as a subject token even when its `aud` is not `mcp-gateway`. The gateway only ever exchanges inbound tokens it has already validated with `aud` containing `mcp-gateway`, so this does not widen access.
+* The MCP Ruby SDK (1.11) rejects any non-loopback `Host` with 403 (DNS-rebinding guard); the compose services set `ALLOWED_HOSTS`.
+
+### Deviations from the spec
+* **Route table**: per-server fields in the database edited in the admin UI (as you asked), instead of a path-prefix table in code. Routing is per tool name (`<server>__<tool>`) on the single `/mcp` endpoint.
+* **Scope name**: tool execution still needs `mcp:tools:execute` (from the OIDC phase), not `mcp:tools:call`.
+* **Spec Part 1.4** said to register tool scopes "on `mcp-orders`". Keycloak evaluates exchange scopes on the *requesting* client, so they are optional scopes of `mcp-gateway` (and realm optional scopes for users). **Part 1.5**: the 300 s TTL is set on `mcp-gateway`, because that is what Keycloak applies (verified above).
+* **Exchange scope** is `<always-requested scopes> <tool scope>` (e.g. `mcp-orders-audience orders:read`), not the tool scope alone, because Keycloak needs the audience scope.
+* **Client authentication** uses HTTP Basic (`client_secret_basic`) rather than `client_id`/`client_secret` form fields. Both are RFC 6749 methods; Basic keeps the secret out of the request body.
+* **Cache key** also includes issuer, client and scope, so two tools with different scopes never share a token.
+* **Outbound check** decodes the issued JWT and checks claims; it does not re-verify the signature (the token comes directly from the token endpoint over an authenticated request). The upstream verifies the signature.
+* **Realm file**: changes are in the existing `keycloak/realm-mcp.json` (imported by compose), not a separate `realm-export.json`.
+* **HTTPS**: token-exchange servers and token-exchange upstreams must be https unless the host is localhost or `ALLOW_INSECURE_HTTP=true` (default only in development/test; compose sets it because the services talk plain http on the compose network).
+* **Refresh tokens** returned by the exchange are ignored and never stored.
+* Not done: per-user filtering of `tools/list` by scope (all tools are listed; calls are checked).

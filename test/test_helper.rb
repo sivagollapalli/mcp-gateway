@@ -14,6 +14,7 @@ module ActiveSupport
 
     setup do
       Oidc.reset!
+      TokenExchange.reset!
       Oidc.config = Oidc::Config.new # OIDC off unless a test installs it (ignore the developer's ENV)
       Rails.cache.clear
       # Pretend every hostname resolves to a public address (no real DNS in tests).

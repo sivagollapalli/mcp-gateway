@@ -4,7 +4,8 @@ class McpController < ActionController::API
   before_action :authenticate_gateway_token!, only: :create
 
   def create
-    result = GatewayRpc.new(gateway_token: @gateway_token, principal: @principal).handle(request.raw_post)
+    result = GatewayRpc.new(gateway_token: @gateway_token, principal: @principal, subject_token: @subject_token)
+                       .handle(request.raw_post)
     if result.body.nil?
       head :accepted
     else
@@ -14,11 +15,18 @@ class McpController < ActionController::API
 
   private
 
-  # Every request needs mcp:read; executing a tool additionally needs mcp:tools:execute.
+  # Every request needs mcp:read; executing a tool also needs mcp:tools:execute and, for
+  # token-exchange upstreams, the tool's own scope (so a missing scope is a 403 with a
+  # WWW-Authenticate challenge naming it, before anything is exchanged or proxied).
   def required_scopes
     scopes = [ "mcp:read" ]
     msg = JSON.parse(request.raw_post) rescue nil
-    scopes << "mcp:tools:execute" if msg.is_a?(Hash) && msg["method"] == "tools/call"
-    scopes
+    return scopes unless msg.is_a?(Hash) && msg["method"] == "tools/call"
+
+    scopes << "mcp:tools:execute"
+    name = msg.dig("params", "name")
+    server, tool = ToolCatalog.resolve(name) if name.is_a?(String)
+    scopes << server.required_scope_for(tool["name"]) if server&.token_exchange? && server.required_scope_for(tool["name"])
+    scopes.uniq
   end
 end

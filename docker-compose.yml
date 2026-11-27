@@ -10,6 +10,8 @@ services:
       KC_HOSTNAME: http://localhost:${KEYCLOAK_PORT:-8080}
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
+      # Substituted into the realm import (client mcp-gateway). Never committed: set it in .env.
+      GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET:?set GATEWAY_CLIENT_SECRET in .env (see .env.example)}
     ports:
       - "${KEYCLOAK_PORT:-8080}:8080"
     volumes:
@@ -32,6 +34,10 @@ services:
     depends_on:
       keycloak:
         condition: service_healthy
+      orders:
+        condition: service_started
+      payments:
+        condition: service_started
     restart: on-failure
     ports:
       - "${GATEWAY_PORT:-8081}:3000"
@@ -46,8 +52,51 @@ services:
       GATEWAY_PUBLIC_URL: ${GATEWAY_PUBLIC_URL:-http://localhost:${GATEWAY_PORT:-8081}}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme-dev-password}
+      # RFC 8693 token exchange (client mcp-gateway in the realm).
+      GATEWAY_CLIENT_ID: mcp-gateway
+      GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET:?set GATEWAY_CLIENT_SECRET in .env (see .env.example)}
+      EXCHANGE_TTL: ${EXCHANGE_TTL:-300}
+      # Dev only: upstreams are plain http on the compose network (private addresses).
+      ALLOW_INSECURE_HTTP: "true"
+      ALLOW_PRIVATE_UPSTREAMS: "true"
+      SEED_TOKEN_EXCHANGE_DEMO: "1"
+      ORDERS_MCP_URL: http://orders:9301/mcp
+      PAYMENTS_MCP_URL: http://payments:9302/mcp
     volumes:
       - gateway-storage:/rails/storage
+
+  # Sample upstream MCP servers. Each validates tokens itself: aud must be exactly its own audience.
+  orders:
+    build: ./mcp_servers
+    command: ["bundle", "exec", "ruby", "orders/server.rb"]
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: on-failure
+    environment: &upstream-env
+      PORT: "9301"
+      OIDC_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost:${KEYCLOAK_PORT:-8080}/realms/mcp}
+      OIDC_INTERNAL_URL: http://keycloak:8080
+      OIDC_AUDIENCE: mcp-orders
+      ALLOWED_HOSTS: orders
+    # Published on loopback only, so you can show that direct calls with a user token fail.
+    ports:
+      - "127.0.0.1:9301:9301"
+
+  payments:
+    build: ./mcp_servers
+    command: ["bundle", "exec", "ruby", "payments/server.rb"]
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: on-failure
+    environment:
+      <<: *upstream-env
+      PORT: "9302"
+      OIDC_AUDIENCE: mcp-payments
+      ALLOWED_HOSTS: payments
+    ports:
+      - "127.0.0.1:9302:9302"
 
 volumes:
   gateway-storage:

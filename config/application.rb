@@ -47,6 +47,10 @@ module McpGateway
     config.x.gateway.stream_max_seconds = Integer(ENV.fetch("MCP_STREAM_MAX_SECONDS", 300)) # SSE streams are recycled (client reconnects)
     config.x.gateway.tools_ttl = 60 # seconds before a server's tool list is considered stale
     config.x.gateway.rate_limit = Integer(ENV.fetch("MCP_RATE_LIMIT", 120)) # requests/minute per token or IP
+    # Plain http to non-localhost token-exchange servers / upstreams. Development only.
+    config.x.gateway.allow_insecure_http = ENV.fetch("ALLOW_INSECURE_HTTP", Rails.env.local? ? "true" : "false") == "true"
+    # Upper bound (seconds) for caching an exchanged upstream token.
+    config.x.gateway.exchange_ttl = Integer(ENV.fetch("EXCHANGE_TTL", 300))
 
     # Active Record encryption. Set the three ENV keys in production
     # (generate with `bin/rails db:encryption:init`). In dev/test they are derived

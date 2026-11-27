@@ -46,6 +46,13 @@ module Oidc
       Rails.logger.info("[oidc] ready issuer=#{config.issuer} audience=#{config.audience} keys=#{provider.key_ids.size}")
     end
 
+    # Gateway scopes plus the tool scopes of enabled token-exchange upstreams, so MCP clients
+    # request them at login (each must exist as a client scope in the realm).
+    def scopes_supported
+      tool_scopes = McpServer.enabled.where(auth_type: "token_exchange").flat_map(&:all_tool_scopes)
+      (Config::SUPPORTED_SCOPES + tool_scopes.sort).uniq
+    end
+
     def reset!
       @config = @provider = nil
     end

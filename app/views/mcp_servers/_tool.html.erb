@@ -4,6 +4,7 @@
     <div class="flex-grow-1">
       <code class="fw-semibold"><%= ToolCatalog.encode_name(server.name, tool["name"]) %></code>
       <% unless enabled %><span class="badge text-bg-secondary ms-1">disabled</span><% end %>
+      <% if server.token_exchange? %><span class="badge text-bg-info ms-1" title="Required scope">scope: <%= server.required_scope_for(tool["name"]) %></span><% end %>
       <div class="small text-secondary mt-1" style="white-space: pre-wrap;"><%= tool["description"] %></div>
       <a class="small" data-bs-toggle="collapse" href="#<%= id %>_schema" role="button" aria-expanded="false" aria-controls="<%= id %>_schema">Input schema</a>
       <div class="collapse mt-1" id="<%= id %>_schema"><pre class="bg-body-secondary p-2 rounded small mb-0"><%= JSON.pretty_generate(tool["inputSchema"] || {}) %></pre></div>

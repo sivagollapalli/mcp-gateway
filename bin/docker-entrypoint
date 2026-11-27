@@ -3,6 +3,8 @@
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
+  # Idempotent: (re)applies the demo token-exchange servers on every start when enabled.
+  if [ "${SEED_TOKEN_EXCHANGE_DEMO}" == "1" ]; then ./bin/rails db:seed; fi
 fi
 
 exec "${@}"

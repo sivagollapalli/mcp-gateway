@@ -8,7 +8,7 @@ class WellKnownController < ActionController::API
     render json: {
       resource: Oidc.config.resource_url,
       authorization_servers: [ Oidc.config.issuer ],
-      scopes_supported: Oidc::Config::SUPPORTED_SCOPES,
+      scopes_supported: Oidc.scopes_supported,
       bearer_methods_supported: [ "header" ]
     }
   end
@@ -24,7 +24,7 @@ class WellKnownController < ActionController::API
       token_endpoint: meta["token_endpoint"],
       registration_endpoint: meta["registration_endpoint"],
       jwks_uri: meta["jwks_uri"],
-      scopes_supported: Oidc::Config::SUPPORTED_SCOPES,
+      scopes_supported: Oidc.scopes_supported,
       response_types_supported: [ "code" ],
       grant_types_supported: (Array(meta["grant_types_supported"]) & %w[authorization_code refresh_token]).presence || [ "authorization_code" ],
       code_challenge_methods_supported: [ "S256" ],

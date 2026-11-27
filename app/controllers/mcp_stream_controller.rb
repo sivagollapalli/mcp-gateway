@@ -35,7 +35,7 @@ class McpStreamController < ActionController::API
       remaining = deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC)
       break if remaining <= 0
 
-      event = queue.pop(timeout: [KEEPALIVE_SECONDS, remaining].min)
+      event = queue.pop(timeout: [ KEEPALIVE_SECONDS, remaining ].min)
       if event
         queue.clear # coalesce bursts into one notification
         response.stream.write("event: message\ndata: #{JSON.generate(NOTIFICATION)}\n\n")

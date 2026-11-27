@@ -19,6 +19,8 @@ module GatewayAuthentication
     return oidc_challenge(:unauthorized) unless token # missing or non-bearer scheme
 
     @principal = Oidc.verifier.verify!(token, required_scopes: required_scopes)
+    # Kept only as an RFC 8693 subject_token; wrapped so it cannot be logged or inspected.
+    @subject_token = TokenExchange::Secret.new(token)
     # Never log the token itself; sub and jti only.
     Rails.logger.info("[oidc] authenticated sub=#{@principal.sub} jti=#{@principal.jti}")
   rescue Oidc::InsufficientScope => e

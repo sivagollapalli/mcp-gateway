@@ -3,8 +3,8 @@
 set -e
 cd "$(dirname "$0")"
 case "$1" in
-  orders)   exec PORT="${ORDERS_PORT:-9301}" bundle exec ruby orders/server.rb ;;
-  payments) exec PORT="${PAYMENTS_PORT:-9302}" bundle exec ruby payments/server.rb ;;
+  orders)   exec env PORT="${ORDERS_PORT:-9301}" bundle exec ruby orders/server.rb ;;
+  payments) exec env PORT="${PAYMENTS_PORT:-9302}" bundle exec ruby payments/server.rb ;;
   all)
     PORT="${ORDERS_PORT:-9301}" bundle exec ruby orders/server.rb &
     PORT="${PAYMENTS_PORT:-9302}" bundle exec ruby payments/server.rb &

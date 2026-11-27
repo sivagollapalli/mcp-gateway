@@ -5935,3 +5935,1176 @@ Completed 401 Unauthorized in 1ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries
 [ActiveJob] [RefreshToolsJob] [44c5993c-a0eb-4a66-abbb-3110dc849fb9]   [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Connection failed: Failed to open TCP connection to 127.0.0.1:9302 (Connection refused - connect(2) for "127.0.0.1" port 9302)', "last_checked_at" = '2026-11-27 09:03:05.109291' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
 [ActiveJob] [RefreshToolsJob] [44c5993c-a0eb-4a66-abbb-3110dc849fb9]   ↳ app/models/mcp_server.rb:49:in 'McpServer#refresh_tools!'
 [ActiveJob] [RefreshToolsJob] [44c5993c-a0eb-4a66-abbb-3110dc849fb9] Performed RefreshToolsJob (Job ID: 44c5993c-a0eb-4a66-abbb-3110dc849fb9) from Async(default) in 9.54ms
+[oidc] ready issuer=http://localhost:18080/realms/mcp audience=mcp-gateway keys=1
+Started GET "/.well-known/oauth-protected-resource" for 127.0.0.1 at 2026-11-27 14:58:09 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.2ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='McpGateway'*/[0m
+Processing by WellKnownController#protected_resource as HTML
+  Parameters: {"well_known" => {}}
+Completed 200 OK in 6ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/oauth-authorization-server" for 127.0.0.1 at 2026-11-27 14:58:09 +0530
+Processing by WellKnownController#authorization_server as HTML
+  Parameters: {"well_known" => {}}
+Completed 200 OK in 0ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for 127.0.0.1 at 2026-11-27 14:58:10 +0530
+Processing by McpController#create as HTML
+  Parameters: {"jsonrpc" => "2.0", "id" => 1, "method" => "tools/list", "mcp" => {"jsonrpc" => "2.0", "id" => 1, "method" => "tools/list"}}
+[oidc] authenticated sub=9cb5669d-da03-4b73-8227-0d632b1896e6 jti=onrtac:10edef20-427b-8aa6-f33d-bc548d933dfd
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND (last_checked_at IS NULL OR last_checked_at < '2026-11-27 09:27:10.252974') ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:78:in 'ToolCatalog.refresh_stale!'
+[mcp-gateway] refresh failed server=orders UpstreamMcp::ConnectionError: Connection failed: Failed to open TCP connection to 127.0.0.1:9301 (Connection refused - connect(2) for "127.0.0.1" port 9301)
+  [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Connection failed: Failed to open TCP connection to 127.0.0.1:9301 (Connection refused - connect(2) for "127.0.0.1" port 9301)', "last_checked_at" = '2026-11-27 09:28:10.258240' WHERE "mcp_servers"."id" = 2 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/mcp_server.rb:49:in 'McpServer#refresh_tools!'
+[mcp-gateway] refresh failed server=payments UpstreamMcp::ConnectionError: Connection failed: Failed to open TCP connection to 127.0.0.1:9302 (Connection refused - connect(2) for "127.0.0.1" port 9302)
+  [1m[36mMcpServer Update (0.1ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Connection failed: Failed to open TCP connection to 127.0.0.1:9302 (Connection refused - connect(2) for "127.0.0.1" port 9302)', "last_checked_at" = '2026-11-27 09:28:10.259388' WHERE "mcp_servers"."id" = 3 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/mcp_server.rb:49:in 'McpServer#refresh_tools!'
+  [1m[36mToolPolicy Pluck (0.0ms)[0m  [1m[34mSELECT "tool_policies"."mcp_server_id", "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."enabled" = FALSE /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:64:in 'ToolCatalog.build'
+  [1m[36mMcpServer Load (0.0ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."last_status" IN ('ok', 'unknown') ORDER BY "mcp_servers"."name" ASC /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:65:in 'Enumerable#flat_map'
+Completed 200 OK in 24ms (Views: 0.1ms | ActiveRecord: 2.1ms (5 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for 127.0.0.1 at 2026-11-27 14:58:10 +0530
+Processing by McpController#create as HTML
+  Parameters: {"jsonrpc" => "2.0", "id" => 2, "method" => "tools/call", "params" => {"name" => "whoami", "arguments" => {}}, "mcp" => {"jsonrpc" => "2.0", "id" => 2, "method" => "tools/call", "params" => {"name" => "whoami", "arguments" => {}}}}
+[oidc] authenticated sub=9cb5669d-da03-4b73-8227-0d632b1896e6 jti=onrtac:10edef20-427b-8aa6-f33d-bc548d933dfd
+Completed 200 OK in 0ms (Views: 0.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+  [1m[36mActiveRecord::InternalMetadata Load (0.1ms)[0m  [1m[34mSELECT * FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = 'environment' ORDER BY "ar_internal_metadata"."key" ASC LIMIT 1 /*application='McpGateway'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='McpGateway'*/[0m
+Migrating to AddTokenExchangeToMcpServers (20261127000001)
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mBEGIN immediate TRANSACTION /*application='McpGateway'*/[0m
+  [1m[35m (0.9ms)[0m  [1m[35mALTER TABLE "mcp_servers" ADD "exchange_issuer" varchar /*application='McpGateway'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "mcp_servers" ADD "exchange_client_id" varchar /*application='McpGateway'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "mcp_servers" ADD "exchange_client_secret" text /*application='McpGateway'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "mcp_servers" ADD "exchange_audience" varchar /*application='McpGateway'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "mcp_servers" ADD "exchange_scope" varchar /*application='McpGateway'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "mcp_servers" ADD "default_tool_scope" varchar /*application='McpGateway'*/[0m
+  [1m[35m (0.1ms)[0m  [1m[35mALTER TABLE "mcp_servers" ADD "tool_scopes" json /*application='McpGateway'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Create (0.0ms)[0m  [1m[32mINSERT INTO "schema_migrations" ("version") VALUES ('20261127000001') RETURNING "version" /*application='McpGateway'*/[0m
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT TRANSACTION /*application='McpGateway'*/[0m
+  [1m[36mActiveRecord::SchemaMigration Load (0.0ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='McpGateway'*/[0m
+Started GET "/session/new" for ::1 at 2026-11-27 15:12:55 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='McpGateway'*/[0m
+Processing by SessionsController#new as HTML
+  Rendering layout layouts/auth.html.erb
+  Rendering sessions/new.html.erb within layouts/auth
+  Rendered sessions/new.html.erb within layouts/auth (Duration: 2.6ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 2.7ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/auth.html.erb (Duration: 6.1ms | GC: 0.0ms)
+Completed 200 OK in 18ms (Views: 7.5ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4] Performing RefreshToolsJob (Job ID: d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4) from Async(default) enqueued at 2026-11-27T09:42:56.259791000Z
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4]   [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4] [mcp-gateway] refresh failed server=orders UpstreamMcp::AuthError: Upstream rejected credentials (HTTP 401)
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4]   [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Upstream rejected credentials (HTTP 401)', "last_checked_at" = '2026-11-27 09:42:56.296654' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4]   ↳ app/models/mcp_server.rb:91:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4] [mcp-gateway] refresh failed server=payments UpstreamMcp::AuthError: Upstream rejected credentials (HTTP 401)
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4]   [1m[36mMcpServer Update (0.1ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Upstream rejected credentials (HTTP 401)', "last_checked_at" = '2026-11-27 09:42:56.306659' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4]   ↳ app/models/mcp_server.rb:91:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4] Performed RefreshToolsJob (Job ID: d5d18fe2-b1db-47a5-a7f5-f424e3ccd2f4) from Async(default) in 44.27ms
+Started POST "/session" for ::1 at 2026-11-27 15:14:23 +0530
+Processing by SessionsController#create as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "[FILTERED]", "password" => "[FILTERED]", "commit" => "Sign in"}
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'admin@example.com' LIMIT 1 /*action='create',application='McpGateway',controller='sessions'*/[0m
+  ↳ app/controllers/sessions_controller.rb:10:in 'SessionsController#create'
+  Rendering layout layouts/auth.html.erb
+  Rendering sessions/new.html.erb within layouts/auth
+  Rendered sessions/new.html.erb within layouts/auth (Duration: 0.5ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/auth.html.erb (Duration: 1.1ms | GC: 0.3ms)
+Completed 422 Unprocessable Content in 242ms (Views: 1.4ms | ActiveRecord: 0.5ms (1 query, 0 cached) | GC: 19.5ms)
+
+
+Started POST "/session" for ::1 at 2026-11-27 15:14:34 +0530
+Processing by SessionsController#create as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "[FILTERED]", "password" => "[FILTERED]", "commit" => "Sign in"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'admin@example.com' LIMIT 1 /*action='create',application='McpGateway',controller='sessions'*/[0m
+  ↳ app/controllers/sessions_controller.rb:10:in 'SessionsController#create'
+  Rendering layout layouts/auth.html.erb
+  Rendering sessions/new.html.erb within layouts/auth
+  Rendered sessions/new.html.erb within layouts/auth (Duration: 1.4ms | GC: 0.7ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/auth.html.erb (Duration: 1.9ms | GC: 0.7ms)
+Completed 422 Unprocessable Content in 242ms (Views: 2.4ms | ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.7ms)
+
+
+Started POST "/session" for ::1 at 2026-11-27 15:14:46 +0530
+Processing by SessionsController#create as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "[FILTERED]", "password" => "[FILTERED]", "commit" => "Sign in"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'admin@example.com' LIMIT 1 /*action='create',application='McpGateway',controller='sessions'*/[0m
+  ↳ app/controllers/sessions_controller.rb:10:in 'SessionsController#create'
+  Rendering layout layouts/auth.html.erb
+  Rendering sessions/new.html.erb within layouts/auth
+  Rendered sessions/new.html.erb within layouts/auth (Duration: 1.1ms | GC: 0.4ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/auth.html.erb (Duration: 1.5ms | GC: 0.4ms)
+Completed 422 Unprocessable Content in 244ms (Views: 2.0ms | ActiveRecord: 0.2ms (1 query, 0 cached) | GC: 0.4ms)
+
+
+Started POST "/session" for ::1 at 2026-11-27 15:15:17 +0530
+Processing by SessionsController#create as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "email" => "[FILTERED]", "password" => "[FILTERED]", "commit" => "Sign in"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."email" = 'admin@example.com' LIMIT 1 /*action='create',application='McpGateway',controller='sessions'*/[0m
+  ↳ app/controllers/sessions_controller.rb:10:in 'SessionsController#create'
+Redirected to http://localhost:3000/
+↳ app/controllers/sessions_controller.rb:14:in 'SessionsController#create'
+Completed 302 Found in 246ms (ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.6ms)
+
+
+Started GET "/" for ::1 at 2026-11-27 15:15:17 +0530
+Processing by DashboardController#show as TURBO_STREAM
+  [1m[36mUser Load (0.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Count (0.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "mcp_servers" /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:3:in 'DashboardController#show'
+  [1m[36mMcpServer Count (0.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:4:in 'DashboardController#show'
+  [1m[36mMcpServer Sum (0.0ms)[0m  [1m[34mSELECT SUM("mcp_servers"."tools_count") FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:5:in 'DashboardController#show'
+  [1m[36mCallLog Count (0.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "call_logs" WHERE "call_logs"."created_at" >= '2026-11-26 09:45:17.514117' /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:6:in 'DashboardController#show'
+  [1m[36mCallLog Count (0.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "call_logs" WHERE "call_logs"."created_at" >= '2026-11-26 09:45:17.514955' AND "call_logs"."status" = 'error' /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:7:in 'DashboardController#show'
+  Rendering layout layouts/application.html.erb
+  Rendering dashboard/show.html.erb within layouts/application
+  [1m[36mMcpServer Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "mcp_servers" WHERE "mcp_servers"."last_status" = 'error' LIMIT 1 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/show.html.erb:19
+  [1m[36mMcpServer Load (0.0ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."last_status" = 'error' ORDER BY "mcp_servers"."name" ASC /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/show.html.erb:22:in 'Enumerable#map'
+  [1m[36mCallLog Exists? (0.0ms)[0m  [1m[34mSELECT 1 AS one FROM "call_logs" WHERE "call_logs"."status" = 'error' LIMIT 1 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/show.html.erb:28
+  [1m[36mCallLog Load (0.0ms)[0m  [1m[34mSELECT "call_logs".* FROM "call_logs" WHERE "call_logs"."status" = 'error' ORDER BY "call_logs"."created_at" DESC, "call_logs"."id" DESC LIMIT 10 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/show.html.erb:35
+  Rendered dashboard/show.html.erb within layouts/application (Duration: 7.8ms | GC: 0.2ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 8.6ms | GC: 0.2ms)
+Completed 200 OK in 15ms (Views: 9.1ms | ActiveRecord: 0.4ms (10 queries, 0 cached) | GC: 0.5ms)
+
+
+Started GET "/mcp_servers" for ::1 at 2026-11-27 15:15:19 +0530
+Processing by McpServersController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/index.html.erb within layouts/application
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."name" ASC /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/views/mcp_servers/index.html.erb:11
+  Rendered mcp_servers/_row.html.erb (Duration: 2.7ms | GC: 0.3ms)
+  Rendered mcp_servers/_row.html.erb (Duration: 2.4ms | GC: 1.2ms)
+  Rendered mcp_servers/index.html.erb within layouts/application (Duration: 12.2ms | GC: 4.7ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.9ms | GC: 0.5ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 15.0ms | GC: 5.8ms)
+Completed 200 OK in 24ms (Views: 15.8ms | ActiveRecord: 0.5ms (2 queries, 0 cached) | GC: 8.2ms)
+
+
+Started GET "/mcp_servers/new" for ::1 at 2026-11-27 15:15:21 +0530
+Processing by McpServersController#new as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='new',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/new.html.erb within layouts/application
+  Rendered mcp_servers/_form.html.erb (Duration: 19.0ms | GC: 8.6ms)
+  Rendered mcp_servers/new.html.erb within layouts/application (Duration: 22.9ms | GC: 10.4ms)
+  Rendered shared/_head_assets.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 31.0ms | GC: 12.6ms)
+Completed 200 OK in 44ms (Views: 32.7ms | ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 18.4ms)
+
+
+Started GET "/mcp_servers" for ::1 at 2026-11-27 15:16:00 +0530
+Processing by McpServersController#index as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/index.html.erb within layouts/application
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."name" ASC /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/views/mcp_servers/index.html.erb:11
+  Rendered mcp_servers/_row.html.erb (Duration: 2.2ms | GC: 0.7ms)
+  Rendered mcp_servers/_row.html.erb (Duration: 0.8ms | GC: 0.3ms)
+  Rendered mcp_servers/index.html.erb within layouts/application (Duration: 8.8ms | GC: 4.8ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.3ms | GC: 0.2ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 10.2ms | GC: 5.4ms)
+Completed 200 OK in 20ms (Views: 12.3ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 10.8ms)
+
+
+Started POST "/mcp_servers/2/refresh" for ::1 at 2026-11-27 15:17:46 +0530
+Processing by McpServersController#refresh as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "id" => "2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  [1m[36mMcpServer Update (0.8ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:47:46.967392' WHERE "mcp_servers"."id" = 2 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[mcp-gateway] tools changed: notifying 0 open stream(s)
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:45:in 'McpServersController#refresh'
+  [1m[36mToolPolicy Pluck (0.1ms)[0m  [1m[34mSELECT "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."mcp_server_id" = 2 AND "tool_policies"."enabled" = FALSE /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:36:in 'McpServer#disabled_tool_names'
+  Rendering mcp_servers/refresh.turbo_stream.erb
+  Rendered mcp_servers/_row.html.erb (Duration: 1.2ms | GC: 0.0ms)
+  Rendered mcp_servers/_status.html.erb (Duration: 0.6ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.9ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered mcp_servers/_tools.html.erb (Duration: 2.4ms | GC: 0.0ms)
+  Rendered mcp_servers/refresh.turbo_stream.erb (Duration: 7.4ms | GC: 0.0ms)
+Completed 200 OK in 106ms (Views: 8.2ms | ActiveRecord: 2.1ms (5 queries, 0 cached) | GC: 2.1ms)
+
+
+Started POST "/mcp_servers/3/refresh" for ::1 at 2026-11-27 15:17:48 +0530
+Processing by McpServersController#refresh as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "id" => "3"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  [1m[36mMcpServer Update (0.4ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:47:48.670362' WHERE "mcp_servers"."id" = 3 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[mcp-gateway] tools changed: notifying 0 open stream(s)
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:45:in 'McpServersController#refresh'
+  [1m[36mToolPolicy Pluck (0.1ms)[0m  [1m[34mSELECT "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."mcp_server_id" = 3 AND "tool_policies"."enabled" = FALSE /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:36:in 'McpServer#disabled_tool_names'
+  Rendering mcp_servers/refresh.turbo_stream.erb
+  Rendered mcp_servers/_row.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered mcp_servers/_status.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered mcp_servers/_tools.html.erb (Duration: 0.8ms | GC: 0.0ms)
+  Rendered mcp_servers/refresh.turbo_stream.erb (Duration: 3.7ms | GC: 0.0ms)
+Completed 200 OK in 86ms (Views: 4.4ms | ActiveRecord: 1.1ms (5 queries, 0 cached) | GC: 0.3ms)
+
+
+Started GET "/mcp_servers/2" for ::1 at 2026-11-27 15:17:49 +0530
+Processing by McpServersController#show as HTML
+  Parameters: {"id" => "2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='show',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='show',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  [1m[36mToolPolicy Pluck (0.7ms)[0m  [1m[34mSELECT "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."mcp_server_id" = 2 AND "tool_policies"."enabled" = FALSE /*action='show',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:36:in 'McpServer#disabled_tool_names'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/show.html.erb within layouts/application
+  Rendered mcp_servers/_status.html.erb (Duration: 0.9ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered mcp_servers/_tools.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered mcp_servers/show.html.erb within layouts/application (Duration: 4.9ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 7.1ms | GC: 0.0ms)
+Completed 200 OK in 20ms (Views: 7.9ms | ActiveRecord: 1.2ms (3 queries, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/mcp_servers/2/edit" for ::1 at 2026-11-27 15:17:52 +0530
+Processing by McpServersController#edit as HTML
+  Parameters: {"id" => "2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/edit.html.erb within layouts/application
+  Rendered mcp_servers/_form.html.erb (Duration: 3.6ms | GC: 0.9ms)
+  Rendered mcp_servers/edit.html.erb within layouts/application (Duration: 4.4ms | GC: 0.9ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 6.5ms | GC: 0.9ms)
+Completed 200 OK in 13ms (Views: 7.0ms | ActiveRecord: 0.5ms (2 queries, 0 cached) | GC: 1.1ms)
+
+
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: b37f4012-a823-488f-b4cb-4fdbdf6656e4) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4] Performing RefreshToolsJob (Job ID: b37f4012-a823-488f-b4cb-4fdbdf6656e4) from Async(default) enqueued at 2026-11-27T09:47:56.265329000Z
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4]   [1m[36mMcpServer Load (0.4ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4]   [1m[36mMcpServer Update (0.6ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:47:56.295987' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4]   [1m[36mMcpServer Update (0.4ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:47:56.310641' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [b37f4012-a823-488f-b4cb-4fdbdf6656e4] Performed RefreshToolsJob (Job ID: b37f4012-a823-488f-b4cb-4fdbdf6656e4) from Async(default) in 40.92ms
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."id" ASC /*application='McpGateway'*/[0m
+Started GET "/mcp_servers/2/edit" for ::1 at 2026-11-27 15:19:09 +0530
+Processing by McpServersController#edit as HTML
+  Parameters: {"id" => "2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/edit.html.erb within layouts/application
+  Rendered mcp_servers/_form.html.erb (Duration: 3.2ms | GC: 0.0ms)
+  Rendered mcp_servers/edit.html.erb within layouts/application (Duration: 3.7ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.5ms | GC: 0.0ms)
+Completed 200 OK in 12ms (Views: 6.2ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."name" = 'orders' LIMIT 1 /*application='McpGateway'*/[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mBEGIN immediate TRANSACTION /*application='McpGateway'*/[0m
+  [1m[36mMcpServer Update (0.0ms)[0m  [1m[33mUPDATE "mcp_servers" SET "auth_type" = 'token_exchange', "updated_at" = '2026-11-27 09:49:23.315519', "exchange_issuer" = 'http://localhost:18080/realms/mcp', "exchange_client_id" = 'mcp-gateway', "exchange_client_secret" = '{"p":"Pv9nsW30f+yQalXrcEVlwNqBO3LTaDzBw4tZ+OI50yKlNNBqozC6DonvgpDBaMSo7tJ9mh0aYQcPzFQXbgWOxQ==","h":{"iv":"TAFFrY8igK3CXwru","at":"AzU0A8dTE707qg1z9PNYug=="}}', "exchange_audience" = 'mcp-orders', "exchange_scope" = 'mcp-orders-audience', "default_tool_scope" = 'orders:read', "tool_scopes" = '{"create_order":"orders:write","update_order":"orders:write"}' WHERE "mcp_servers"."id" = 2 /*application='McpGateway'*/[0m
+  [1m[36mTRANSACTION (0.1ms)[0m  [1m[35mCOMMIT TRANSACTION /*application='McpGateway'*/[0m
+[mcp-gateway] tools changed: notifying 0 open stream(s)
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 58c03cd8-3691-47af-b74f-e270fa8df67b) to Async(default) with arguments: 2
+[ActiveJob] ↳ app/models/mcp_server.rb:115:in 'McpServer#after_change'
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*application='McpGateway'*/[0m
+  [1m[36mMcpServer Load (0.0ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."name" = 'payments' LIMIT 1 /*application='McpGateway'*/[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mBEGIN immediate TRANSACTION /*application='McpGateway'*/[0m
+  [1m[36mMcpServer Update (0.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "auth_type" = 'token_exchange', "updated_at" = '2026-11-27 09:49:23.339398', "exchange_issuer" = 'http://localhost:18080/realms/mcp', "exchange_client_id" = 'mcp-gateway', "exchange_client_secret" = '{"p":"DF1HHP26EfdmZ+9ecb7bHAMXr129aGNJHVon5e8b7XR+YueRzGk2j8Ofk7GYd82feN7cBi1HPUZyoc1W9lUy0g==","h":{"iv":"IZHWAKxpGc7D10E+","at":"gQdT3Vldz76NhfBxn6xeAw=="}}', "exchange_audience" = 'mcp-payments', "exchange_scope" = 'mcp-payments-audience', "default_tool_scope" = 'payments:refund', "tool_scopes" = '{}' WHERE "mcp_servers"."id" = 3 /*application='McpGateway'*/[0m
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mCOMMIT TRANSACTION /*application='McpGateway'*/[0m
+[mcp-gateway] tools changed: notifying 0 open stream(s)
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 72f5f541-a5b5-474f-9d7c-a3ecca3dfac4) to Async(default) with arguments: 3
+[ActiveJob] ↳ app/models/mcp_server.rb:115:in 'McpServer#after_change'
+  [1m[36mMcpServer Load (0.0ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*application='McpGateway'*/[0m
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."name" IN ('orders', 'payments') /*application='McpGateway'*/[0m
+  [1m[36mMcpServer Update (0.2ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:49:35.769732' WHERE "mcp_servers"."id" = 2 /*application='McpGateway'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*application='McpGateway'*/[0m
+  [1m[36mMcpServer Update (0.2ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:49:35.804130' WHERE "mcp_servers"."id" = 3 /*application='McpGateway'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*application='McpGateway'*/[0m
+Started GET "/mcp_servers/2/edit" for ::1 at 2026-11-27 15:19:40 +0530
+Processing by McpServersController#edit as HTML
+  Parameters: {"id" => "2"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/edit.html.erb within layouts/application
+  Rendered mcp_servers/_form.html.erb (Duration: 24.8ms | GC: 0.0ms)
+  Rendered mcp_servers/edit.html.erb within layouts/application (Duration: 25.1ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 25.9ms | GC: 0.0ms)
+Completed 200 OK in 30ms (Views: 26.4ms | ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp_servers" for ::1 at 2026-11-27 15:20:12 +0530
+Processing by McpServersController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/index.html.erb within layouts/application
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."name" ASC /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/views/mcp_servers/index.html.erb:11
+  Rendered mcp_servers/_row.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered mcp_servers/_row.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered mcp_servers/index.html.erb within layouts/application (Duration: 6.6ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 8.8ms | GC: 0.0ms)
+Completed 200 OK in 15ms (Views: 9.3ms | ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp_servers/3" for ::1 at 2026-11-27 15:20:16 +0530
+Processing by McpServersController#show as HTML
+  Parameters: {"id" => "3"}
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='show',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*action='show',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  [1m[36mToolPolicy Pluck (0.1ms)[0m  [1m[34mSELECT "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."mcp_server_id" = 3 AND "tool_policies"."enabled" = FALSE /*action='show',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:36:in 'McpServer#disabled_tool_names'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/show.html.erb within layouts/application
+  Rendered mcp_servers/_status.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.6ms | GC: 0.0ms)
+  Rendered mcp_servers/_tools.html.erb (Duration: 0.9ms | GC: 0.0ms)
+  Rendered mcp_servers/show.html.erb within layouts/application (Duration: 2.5ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 4.2ms | GC: 0.0ms)
+Completed 200 OK in 13ms (Views: 5.1ms | ActiveRecord: 0.5ms (3 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp_servers/3/edit" for ::1 at 2026-11-27 15:20:18 +0530
+Processing by McpServersController#edit as HTML
+  Parameters: {"id" => "3"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/edit.html.erb within layouts/application
+  Rendered mcp_servers/_form.html.erb (Duration: 3.6ms | GC: 0.0ms)
+  Rendered mcp_servers/edit.html.erb within layouts/application (Duration: 4.0ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 6.6ms | GC: 0.0ms)
+Completed 200 OK in 14ms (Views: 7.3ms | ActiveRecord: 0.5ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp_servers/3/edit" for ::1 at 2026-11-27 15:20:19 +0530
+Processing by McpServersController#edit as HTML
+  Parameters: {"id" => "3"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/edit.html.erb within layouts/application
+  Rendered mcp_servers/_form.html.erb (Duration: 4.0ms | GC: 0.0ms)
+  Rendered mcp_servers/edit.html.erb within layouts/application (Duration: 4.5ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 6.7ms | GC: 0.0ms)
+Completed 200 OK in 13ms (Views: 7.4ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/connect" for ::1 at 2026-11-27 15:20:30 +0530
+Processing by ConnectController#show as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='show',application='McpGateway',controller='connect'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering connect/show.html.erb within layouts/application
+  [1m[36mGatewayToken Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "gateway_tokens" WHERE "gateway_tokens"."revoked_at" IS NULL LIMIT 1 /*action='show',application='McpGateway',controller='connect'*/[0m
+  ↳ app/views/connect/show.html.erb:7
+  Rendered connect/show.html.erb within layouts/application (Duration: 1.6ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.0ms | GC: 0.0ms)
+Completed 200 OK in 15ms (Views: 3.7ms | ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/gateway_tokens" for ::1 at 2026-11-27 15:20:30 +0530
+Processing by GatewayTokensController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering gateway_tokens/index.html.erb within layouts/application
+  [1m[36mGatewayToken Load (0.4ms)[0m  [1m[34mSELECT "gateway_tokens".* FROM "gateway_tokens" ORDER BY "gateway_tokens"."created_at" DESC /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/views/gateway_tokens/index.html.erb:10
+  Rendered gateway_tokens/index.html.erb within layouts/application (Duration: 9.9ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 11.7ms | GC: 0.0ms)
+Completed 200 OK in 22ms (Views: 13.0ms | ActiveRecord: 1.0ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/gateway_tokens/new" for ::1 at 2026-11-27 15:20:38 +0530
+Processing by GatewayTokensController#new as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='new',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering gateway_tokens/new.html.erb within layouts/application
+  Rendered gateway_tokens/new.html.erb within layouts/application (Duration: 1.6ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.3ms | GC: 0.0ms)
+Completed 200 OK in 11ms (Views: 4.0ms | ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/gateway_tokens" for ::1 at 2026-11-27 15:20:40 +0530
+Processing by GatewayTokensController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering gateway_tokens/index.html.erb within layouts/application
+  [1m[36mGatewayToken Load (0.2ms)[0m  [1m[34mSELECT "gateway_tokens".* FROM "gateway_tokens" ORDER BY "gateway_tokens"."created_at" DESC /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/views/gateway_tokens/index.html.erb:10
+  Rendered gateway_tokens/index.html.erb within layouts/application (Duration: 3.7ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.6ms | GC: 0.0ms)
+Completed 200 OK in 11ms (Views: 6.0ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/call_logs" for ::1 at 2026-11-27 15:20:42 +0530
+Processing by CallLogsController#index as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mCallLog Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "call_logs" /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/controllers/application_controller.rb:19:in 'ApplicationController#paginate'
+  Rendering layout layouts/application.html.erb
+  Rendering call_logs/index.html.erb within layouts/application
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."name" ASC /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:5
+  [1m[36mCallLog Load (0.1ms)[0m  [1m[34mSELECT "call_logs".* FROM "call_logs" ORDER BY "call_logs"."created_at" DESC, "call_logs"."id" DESC LIMIT 25 OFFSET 0 /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:16
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" IN (3, 2) /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:16
+  [1m[36mGatewayToken Load (0.1ms)[0m  [1m[34mSELECT "gateway_tokens".* FROM "gateway_tokens" WHERE "gateway_tokens"."id" IN (3, 2, 1) /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:16
+  Rendered call_logs/index.html.erb within layouts/application (Duration: 8.6ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 10.2ms | GC: 0.0ms)
+Completed 200 OK in 18ms (Views: 10.5ms | ActiveRecord: 1.1ms (6 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/connect" for ::1 at 2026-11-27 15:20:45 +0530
+Processing by ConnectController#show as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='show',application='McpGateway',controller='connect'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering connect/show.html.erb within layouts/application
+  [1m[36mGatewayToken Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "gateway_tokens" WHERE "gateway_tokens"."revoked_at" IS NULL LIMIT 1 /*action='show',application='McpGateway',controller='connect'*/[0m
+  ↳ app/views/connect/show.html.erb:7
+  Rendered connect/show.html.erb within layouts/application (Duration: 1.6ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 3.6ms | GC: 0.0ms)
+Completed 200 OK in 9ms (Views: 4.2ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/call_logs" for ::1 at 2026-11-27 15:20:47 +0530
+Processing by CallLogsController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mCallLog Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "call_logs" /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/controllers/application_controller.rb:19:in 'ApplicationController#paginate'
+  Rendering layout layouts/application.html.erb
+  Rendering call_logs/index.html.erb within layouts/application
+  [1m[36mMcpServer Load (0.6ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."name" ASC /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:5
+  [1m[36mCallLog Load (0.4ms)[0m  [1m[34mSELECT "call_logs".* FROM "call_logs" ORDER BY "call_logs"."created_at" DESC, "call_logs"."id" DESC LIMIT 25 OFFSET 0 /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:16
+  [1m[36mMcpServer Load (0.4ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" IN (3, 2) /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:16
+  [1m[36mGatewayToken Load (0.2ms)[0m  [1m[34mSELECT "gateway_tokens".* FROM "gateway_tokens" WHERE "gateway_tokens"."id" IN (3, 2, 1) /*action='index',application='McpGateway',controller='call_logs'*/[0m
+  ↳ app/views/call_logs/index.html.erb:16
+  Rendered call_logs/index.html.erb within layouts/application (Duration: 11.8ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 13.6ms | GC: 0.0ms)
+Completed 200 OK in 22ms (Views: 13.0ms | ActiveRecord: 2.2ms (6 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/gateway_tokens" for ::1 at 2026-11-27 15:20:47 +0530
+Processing by GatewayTokensController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering gateway_tokens/index.html.erb within layouts/application
+  [1m[36mGatewayToken Load (0.4ms)[0m  [1m[34mSELECT "gateway_tokens".* FROM "gateway_tokens" ORDER BY "gateway_tokens"."created_at" DESC /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/views/gateway_tokens/index.html.erb:10
+  Rendered gateway_tokens/index.html.erb within layouts/application (Duration: 5.1ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 7.2ms | GC: 0.0ms)
+Completed 200 OK in 12ms (Views: 7.5ms | ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp_servers" for ::1 at 2026-11-27 15:20:48 +0530
+Processing by McpServersController#index as HTML
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/index.html.erb within layouts/application
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."name" ASC /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/views/mcp_servers/index.html.erb:11
+  Rendered mcp_servers/_row.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered mcp_servers/_row.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered mcp_servers/index.html.erb within layouts/application (Duration: 5.0ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 6.5ms | GC: 0.0ms)
+Completed 200 OK in 12ms (Views: 7.1ms | ActiveRecord: 0.6ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2026-11-27 15:20:48 +0530
+Processing by DashboardController#show as HTML
+  [1m[36mUser Load (0.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "mcp_servers" /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:3:in 'DashboardController#show'
+  [1m[36mMcpServer Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:4:in 'DashboardController#show'
+  [1m[36mMcpServer Sum (0.1ms)[0m  [1m[34mSELECT SUM("mcp_servers"."tools_count") FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:5:in 'DashboardController#show'
+  [1m[36mCallLog Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "call_logs" WHERE "call_logs"."created_at" >= '2026-11-26 09:50:48.593017' /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:6:in 'DashboardController#show'
+  [1m[36mCallLog Count (0.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "call_logs" WHERE "call_logs"."created_at" >= '2026-11-26 09:50:48.594277' AND "call_logs"."status" = 'error' /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/controllers/dashboard_controller.rb:7:in 'DashboardController#show'
+  Rendering layout layouts/application.html.erb
+  Rendering dashboard/show.html.erb within layouts/application
+  [1m[36mMcpServer Exists? (0.2ms)[0m  [1m[34mSELECT 1 AS one FROM "mcp_servers" WHERE "mcp_servers"."last_status" = 'error' LIMIT 1 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/show.html.erb:19
+  [1m[36mCallLog Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "call_logs" WHERE "call_logs"."status" = 'error' LIMIT 1 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/show.html.erb:28
+  [1m[36mCallLog Load (0.1ms)[0m  [1m[34mSELECT "call_logs".* FROM "call_logs" WHERE "call_logs"."status" = 'error' ORDER BY "call_logs"."created_at" DESC, "call_logs"."id" DESC LIMIT 10 /*action='show',application='McpGateway',controller='dashboard'*/[0m
+  ↳ app/views/dashboard/show.html.erb:35
+  Rendered dashboard/show.html.erb within layouts/application (Duration: 3.8ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.7ms | GC: 0.0ms)
+Completed 200 OK in 16ms (Views: 5.9ms | ActiveRecord: 1.2ms (9 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/gateway_tokens" for ::1 at 2026-11-27 15:20:50 +0530
+Processing by GatewayTokensController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering gateway_tokens/index.html.erb within layouts/application
+  [1m[36mGatewayToken Load (0.2ms)[0m  [1m[34mSELECT "gateway_tokens".* FROM "gateway_tokens" ORDER BY "gateway_tokens"."created_at" DESC /*action='index',application='McpGateway',controller='gateway_tokens'*/[0m
+  ↳ app/views/gateway_tokens/index.html.erb:10
+  Rendered gateway_tokens/index.html.erb within layouts/application (Duration: 3.9ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.7ms | GC: 0.0ms)
+Completed 200 OK in 10ms (Views: 6.3ms | ActiveRecord: 0.5ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp_servers" for ::1 at 2026-11-27 15:20:51 +0530
+Processing by McpServersController#index as HTML
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/index.html.erb within layouts/application
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" ORDER BY "mcp_servers"."name" ASC /*action='index',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/views/mcp_servers/index.html.erb:11
+  Rendered mcp_servers/_row.html.erb (Duration: 1.1ms | GC: 0.0ms)
+  Rendered mcp_servers/_row.html.erb (Duration: 0.8ms | GC: 0.0ms)
+  Rendered mcp_servers/index.html.erb within layouts/application (Duration: 3.8ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.5ms | GC: 0.0ms)
+Completed 200 OK in 11ms (Views: 5.8ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp_servers/2/refresh" for ::1 at 2026-11-27 15:20:54 +0530
+Processing by McpServersController#refresh as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "id" => "2"}
+  [1m[36mUser Load (0.4ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:50:54.476699' WHERE "mcp_servers"."id" = 2 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:45:in 'McpServersController#refresh'
+  [1m[36mToolPolicy Pluck (0.2ms)[0m  [1m[34mSELECT "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."mcp_server_id" = 2 AND "tool_policies"."enabled" = FALSE /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:36:in 'McpServer#disabled_tool_names'
+  Rendering mcp_servers/refresh.turbo_stream.erb
+  Rendered mcp_servers/_row.html.erb (Duration: 2.1ms | GC: 0.0ms)
+  Rendered mcp_servers/_status.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered mcp_servers/_tools.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered mcp_servers/refresh.turbo_stream.erb (Duration: 5.1ms | GC: 0.0ms)
+Completed 200 OK in 133ms (Views: 5.8ms | ActiveRecord: 1.2ms (5 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp_servers/3/refresh" for ::1 at 2026-11-27 15:20:55 +0530
+Processing by McpServersController#refresh as TURBO_STREAM
+  Parameters: {"authenticity_token" => "[FILTERED]", "id" => "3"}
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  [1m[36mMcpServer Update (0.7ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:50:56.069296' WHERE "mcp_servers"."id" = 3 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+  [1m[36mMcpServer Load (0.5ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 3 LIMIT 1 /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:45:in 'McpServersController#refresh'
+  [1m[36mToolPolicy Pluck (0.2ms)[0m  [1m[34mSELECT "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."mcp_server_id" = 3 AND "tool_policies"."enabled" = FALSE /*action='refresh',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/models/mcp_server.rb:36:in 'McpServer#disabled_tool_names'
+  Rendering mcp_servers/refresh.turbo_stream.erb
+  Rendered mcp_servers/_row.html.erb (Duration: 27.5ms | GC: 25.6ms)
+  Rendered mcp_servers/_status.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered mcp_servers/_tool.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered mcp_servers/_tools.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered mcp_servers/refresh.turbo_stream.erb (Duration: 29.3ms | GC: 25.6ms)
+Completed 200 OK in 127ms (Views: 30.0ms | ActiveRecord: 1.7ms (5 queries, 0 cached) | GC: 25.6ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:21:18 +0530
+Processing by McpController#create as JSON
+  Parameters: {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}, "mcp" => {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}}}
+  [1m[36mGatewayToken Load (0.2ms)[0m  [1m[34mSELECT "gateway_tokens".* FROM "gateway_tokens" WHERE "gateway_tokens"."revoked_at" IS NULL AND "gateway_tokens"."token_digest" = 'fb5e46f7e206f31aa92f40bae994bf739de00b4694ddd48b128188b6dc69f4e3' LIMIT 1 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/gateway_token.rb:19:in 'GatewayToken.authenticate'
+Filter chain halted as :authenticate_gateway_token! rendered or redirected
+Completed 401 Unauthorized in 2ms (Views: 0.1ms | ActiveRecord: 0.2ms (1 query, 0 cached) | GC: 0.4ms)
+
+
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:21:18 +0530
+Processing by WellKnownController#protected_resource as */*
+Filter chain halted as :require_oidc rendered or redirected
+Completed 404 Not Found in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:21:18 +0530
+Processing by McpController#create as JSON
+  Parameters: {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}, "mcp" => {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}}}
+Filter chain halted as :authenticate_gateway_token! rendered or redirected
+Completed 401 Unauthorized in 1ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.5ms)
+
+
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:21:18 +0530
+Processing by WellKnownController#protected_resource as */*
+Filter chain halted as :require_oidc rendered or redirected
+Completed 404 Not Found in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:21:27 +0530
+Processing by WellKnownController#protected_resource as */*
+Filter chain halted as :require_oidc rendered or redirected
+Completed 404 Not Found in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/oauth-authorization-server" for ::1 at 2026-11-27 15:21:27 +0530
+Processing by WellKnownController#authorization_server as JSON
+Filter chain halted as :require_oidc rendered or redirected
+Completed 404 Not Found in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/openid-configuration" for ::1 at 2026-11-27 15:21:27 +0530
+  
+ActionController::RoutingError (No route matches [GET] "/.well-known/openid-configuration"):
+  
+Started GET "/.well-known/oauth-authorization-server/mcp" for ::1 at 2026-11-27 15:21:27 +0530
+Processing by WellKnownController#authorization_server as JSON
+Filter chain halted as :require_oidc rendered or redirected
+Completed 404 Not Found in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/openid-configuration/mcp" for ::1 at 2026-11-27 15:21:27 +0530
+  
+ActionController::RoutingError (No route matches [GET] "/.well-known/openid-configuration/mcp"):
+  
+Started GET "/mcp/.well-known/openid-configuration" for ::1 at 2026-11-27 15:21:27 +0530
+  
+ActionController::RoutingError (No route matches [GET] "/mcp/.well-known/openid-configuration"):
+  
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:21:27 +0530
+Processing by WellKnownController#protected_resource as */*
+Filter chain halted as :require_oidc rendered or redirected
+Completed 404 Not Found in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/oauth-authorization-server" for ::1 at 2026-11-27 15:21:27 +0530
+Processing by WellKnownController#authorization_server as JSON
+Filter chain halted as :require_oidc rendered or redirected
+Completed 404 Not Found in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/openid-configuration" for ::1 at 2026-11-27 15:21:27 +0530
+  
+ActionController::RoutingError (No route matches [GET] "/.well-known/openid-configuration"):
+  
+Started POST "/register" for ::1 at 2026-11-27 15:21:27 +0530
+  
+ActionController::RoutingError (No route matches [POST] "/register"):
+  
+[oidc] ready issuer=http://localhost:18080/realms/mcp audience=mcp-gateway keys=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: f92cd01c-dea7-4c48-942f-0912fb7e359f) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f] Performing RefreshToolsJob (Job ID: f92cd01c-dea7-4c48-942f-0912fb7e359f) from Async(default) enqueued at 2026-11-27T09:52:36.119740000Z
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f]   [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f] [mcp-gateway] refresh failed server=orders UpstreamMcp::ConnectionError: Connection failed: Failed to open TCP connection to 127.0.0.1:9301 (Connection refused - connect(2) for "127.0.0.1" port 9301)
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f]   [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Connection failed: Failed to open TCP connection to 127.0.0.1:9301 (Connection refused - connect(2) for "127.0.0.1" port 9301)', "last_checked_at" = '2026-11-27 09:52:36.287193' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f]   ↳ app/models/mcp_server.rb:91:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f] [mcp-gateway] tools changed: notifying 0 open stream(s)
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f] [mcp-gateway] refresh failed server=payments UpstreamMcp::ConnectionError: Connection failed: Failed to open TCP connection to 127.0.0.1:9302 (Connection refused - connect(2) for "127.0.0.1" port 9302)
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f]   [1m[36mMcpServer Update (0.1ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Connection failed: Failed to open TCP connection to 127.0.0.1:9302 (Connection refused - connect(2) for "127.0.0.1" port 9302)', "last_checked_at" = '2026-11-27 09:52:36.307046' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f]   ↳ app/models/mcp_server.rb:91:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f] [mcp-gateway] tools changed: notifying 0 open stream(s)
+[ActiveJob] [RefreshToolsJob] [f92cd01c-dea7-4c48-942f-0912fb7e359f] Performed RefreshToolsJob (Job ID: f92cd01c-dea7-4c48-942f-0912fb7e359f) from Async(default) in 94.69ms
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:23:27 +0530
+  [1m[36mActiveRecord::SchemaMigration Load (0.1ms)[0m  [1m[34mSELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC /*application='McpGateway'*/[0m
+Processing by WellKnownController#protected_resource as */*
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."auth_type" = 'token_exchange' /*action='protected_resource',application='McpGateway',controller='well_known'*/[0m
+  ↳ app/services/oidc.rb:52:in 'Enumerable#flat_map'
+Completed 200 OK in 5ms (Views: 0.1ms | ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:23:27 +0530
+Processing by WellKnownController#protected_resource as */*
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."auth_type" = 'token_exchange' /*action='protected_resource',application='McpGateway',controller='well_known'*/[0m
+  ↳ app/services/oidc.rb:52:in 'Enumerable#flat_map'
+Completed 200 OK in 1ms (Views: 0.1ms | ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:23:37 +0530
+Processing by McpController#create as JSON
+  Parameters: {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}, "mcp" => {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:5031ee4e-77d9-ca54-8070-2683eaf8c0a8
+Completed 200 OK in 4ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:23:37 +0530
+Processing by McpController#create as JSON
+  Parameters: {"method" => "initialize", "params" => {"protocolVersion" => "2025-11-25", "capabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}}, "clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}}, "jsonrpc" => "2.0", "id" => 0, "mcp" => {"method" => "initialize", "params" => {"protocolVersion" => "2025-11-25", "capabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}}, "clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}}, "jsonrpc" => "2.0", "id" => 0}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:5031ee4e-77d9-ca54-8070-2683eaf8c0a8
+Completed 200 OK in 1ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:23:37 +0530
+Processing by McpController#create as JSON
+  Parameters: {"jsonrpc" => "2.0", "method" => "notifications/initialized", "mcp" => {"jsonrpc" => "2.0", "method" => "notifications/initialized"}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:5031ee4e-77d9-ca54-8070-2683eaf8c0a8
+Completed 202 Accepted in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:23:37 +0530
+Started POST "/mcp" for ::1 at 2026-11-27 15:23:37 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:5031ee4e-77d9-ca54-8070-2683eaf8c0a8
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+Processing by McpController#create as JSON
+  Parameters: {"method" => "tools/list", "jsonrpc" => "2.0", "id" => 1, "mcp" => {"method" => "tools/list", "jsonrpc" => "2.0", "id" => 1}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:5031ee4e-77d9-ca54-8070-2683eaf8c0a8
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND (last_checked_at IS NULL OR last_checked_at < '2026-11-27 09:52:37.936003') ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:78:in 'ToolCatalog.refresh_stale!'
+  [1m[36mMcpServer Update (0.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:53:37.962911' WHERE "mcp_servers"."id" = 2 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[mcp-gateway] tools changed: notifying 1 open stream(s)
+[mcp-gateway] sent notifications/tools/list_changed to caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+[mcp-gateway] refresh failed server=payments UpstreamMcp::AuthError: Upstream rejected credentials (HTTP 401)
+  [1m[36mMcpServer Update (0.2ms)[0m  [1m[33mUPDATE "mcp_servers" SET "last_status" = 'error', "last_error" = 'Upstream rejected credentials (HTTP 401)', "last_checked_at" = '2026-11-27 09:53:37.976147' WHERE "mcp_servers"."id" = 3 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/mcp_server.rb:91:in 'McpServer#refresh_tools!'
+  [1m[36mToolPolicy Pluck (0.2ms)[0m  [1m[34mSELECT "tool_policies"."mcp_server_id", "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."enabled" = FALSE /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:64:in 'ToolCatalog.build'
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."last_status" IN ('ok', 'unknown') ORDER BY "mcp_servers"."name" ASC /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:65:in 'Enumerable#flat_map'
+Completed 200 OK in 72ms (Views: 0.2ms | ActiveRecord: 1.5ms (5 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:26:51 +0530
+Processing by WellKnownController#protected_resource as */*
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."auth_type" = 'token_exchange' /*action='protected_resource',application='McpGateway',controller='well_known'*/[0m
+  ↳ app/services/oidc.rb:52:in 'Enumerable#flat_map'
+Completed 200 OK in 1ms (Views: 0.1ms | ActiveRecord: 0.2ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:26:51 +0530
+Processing by WellKnownController#protected_resource as */*
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."auth_type" = 'token_exchange' /*action='protected_resource',application='McpGateway',controller='well_known'*/[0m
+  ↳ app/services/oidc.rb:52:in 'Enumerable#flat_map'
+Completed 200 OK in 1ms (Views: 0.1ms | ActiveRecord: 0.1ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:26:58 +0530
+Processing by McpController#create as JSON
+  Parameters: {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}, "mcp" => {"jsonrpc" => "2.0", "id" => "server-discover-probe-1", "method" => "server/discover", "params" => {"_meta" => {"io.modelcontextprotocol/protocolVersion" => "2026-07-28", "io.modelcontextprotocol/clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}, "io.modelcontextprotocol/clientCapabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}, "extensions" => {"io.modelcontextprotocol/tasks" => {}}}}}}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:1df5b1d4-35ef-3032-f092-53a4d3e0c448
+Completed 200 OK in 0ms (Views: 0.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:26:58 +0530
+Processing by McpController#create as JSON
+  Parameters: {"method" => "initialize", "params" => {"protocolVersion" => "2025-11-25", "capabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}}, "clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}}, "jsonrpc" => "2.0", "id" => 0, "mcp" => {"method" => "initialize", "params" => {"protocolVersion" => "2025-11-25", "capabilities" => {"roots" => {"listChanged" => true}, "elicitation" => {"form" => {}, "url" => {}}}, "clientInfo" => {"name" => "claude-code", "title" => "Claude Code", "version" => "2.1.332", "description" => "Anthropic's agentic coding tool", "websiteUrl" => "https://claude.com/claude-code"}}, "jsonrpc" => "2.0", "id" => 0}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:1df5b1d4-35ef-3032-f092-53a4d3e0c448
+Completed 200 OK in 0ms (Views: 0.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started POST "/mcp" for ::1 at 2026-11-27 15:26:58 +0530
+Processing by McpController#create as JSON
+  Parameters: {"jsonrpc" => "2.0", "method" => "notifications/initialized", "mcp" => {"jsonrpc" => "2.0", "method" => "notifications/initialized"}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:1df5b1d4-35ef-3032-f092-53a4d3e0c448
+Completed 202 Accepted in 0ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:26:58 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:1df5b1d4-35ef-3032-f092-53a4d3e0c448
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=2
+Started POST "/mcp" for ::1 at 2026-11-27 15:26:58 +0530
+Processing by McpController#create as JSON
+  Parameters: {"method" => "tools/list", "jsonrpc" => "2.0", "id" => 1, "mcp" => {"method" => "tools/list", "jsonrpc" => "2.0", "id" => 1}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtac:1df5b1d4-35ef-3032-f092-53a4d3e0c448
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND (last_checked_at IS NULL OR last_checked_at < '2026-11-27 09:55:58.463269') ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:78:in 'ToolCatalog.refresh_stale!'
+  [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:56:58.494364' WHERE "mcp_servers"."id" = 2 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+  [1m[36mMcpServer Update (0.1ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:56:58.510332' WHERE "mcp_servers"."id" = 3 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[mcp-gateway] tools changed: notifying 2 open stream(s)
+[mcp-gateway] sent notifications/tools/list_changed to caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+[mcp-gateway] sent notifications/tools/list_changed to caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+  [1m[36mToolPolicy Pluck (0.1ms)[0m  [1m[34mSELECT "tool_policies"."mcp_server_id", "tool_policies"."tool_name" FROM "tool_policies" WHERE "tool_policies"."enabled" = FALSE /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:64:in 'ToolCatalog.build'
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."last_status" IN ('ok', 'unknown') ORDER BY "mcp_servers"."name" ASC /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:65:in 'Enumerable#flat_map'
+Completed 200 OK in 49ms (Views: 0.1ms | ActiveRecord: 0.7ms (5 queries, 0 cached) | GC: 0.0ms)
+
+
+[mcp-gateway] SSE stream closed after 216s (client disconnected) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 215585ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 79818664-cbe9-46e8-9692-95b3fa5db69a) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a] Performing RefreshToolsJob (Job ID: 79818664-cbe9-46e8-9692-95b3fa5db69a) from Async(default) enqueued at 2026-11-27T09:57:36.148306000Z
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a]   [1m[36mMcpServer Load (0.4ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a]   [1m[36mMcpServer Update (1.1ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:57:36.231104' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a]   [1m[36mMcpServer Update (0.2ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 09:57:36.282672' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [79818664-cbe9-46e8-9692-95b3fa5db69a] Performed RefreshToolsJob (Job ID: 79818664-cbe9-46e8-9692-95b3fa5db69a) from Async(default) in 125.42ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300003ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:31:59 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:c3804419-2849-6bdc-71a3-8787275c22ae
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9] Performing RefreshToolsJob (Job ID: e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9) from Async(default) enqueued at 2026-11-27T10:02:36.158748000Z
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9]   [1m[36mMcpServer Load (0.4ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9]   [1m[36mMcpServer Update (0.6ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:02:36.245738' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9]   [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:02:36.290731' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9] Performed RefreshToolsJob (Job ID: e7d37f6a-7f49-42dd-8fd5-fcb107cdf3b9) from Async(default) in 123.22ms
+Started GET "/.well-known/oauth-protected-resource" for ::1 at 2026-11-27 15:36:34 +0530
+Processing by WellKnownController#protected_resource as */*
+  [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."auth_type" = 'token_exchange' /*action='protected_resource',application='McpGateway',controller='well_known'*/[0m
+  ↳ app/services/oidc.rb:52:in 'Enumerable#flat_map'
+Completed 200 OK in 3ms (Views: 0.3ms | ActiveRecord: 0.3ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300007ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 39.8ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:37:01 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:fa7c5476-6391-c2c8-1465-6d1594f0aa64
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: fdb70202-8178-43a4-8619-e96af92a29b1) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1] Performing RefreshToolsJob (Job ID: fdb70202-8178-43a4-8619-e96af92a29b1) from Async(default) enqueued at 2026-11-27T10:07:36.167067000Z
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1]   [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1]   [1m[36mMcpServer Update (1.2ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:07:36.241160' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1]   [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:07:36.310162' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [fdb70202-8178-43a4-8619-e96af92a29b1] Performed RefreshToolsJob (Job ID: fdb70202-8178-43a4-8619-e96af92a29b1) from Async(default) in 139.6ms
+Started POST "/mcp" for ::1 at 2026-11-27 15:37:54 +0530
+Processing by McpController#create as JSON
+  Parameters: {"method" => "tools/call", "params" => {"name" => "whoami", "arguments" => {}, "_meta" => {"claudecode/toolUseId" => "call-c863f9d8-811e-4df6-a081-16bac75687e1", "progressToken" => "[FILTERED]"}}, "jsonrpc" => "2.0", "id" => 2, "mcp" => {"method" => "tools/call", "params" => {"name" => "whoami", "arguments" => {}, "_meta" => {"claudecode/toolUseId" => "call-c863f9d8-811e-4df6-a081-16bac75687e1", "progressToken" => "[FILTERED]"}}, "jsonrpc" => "2.0", "id" => 2}}
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:fa7c5476-6391-c2c8-1465-6d1594f0aa64
+Completed 200 OK in 2ms (Views: 0.1ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 1.4ms)
+
+
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300007ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 5.0ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:42:02 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:a3cffca6-3b39-9352-a4b4-3e9f98f02be9
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 15ce28be-5ee9-4a21-8f01-f1ef566a2e59) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59] Performing RefreshToolsJob (Job ID: 15ce28be-5ee9-4a21-8f01-f1ef566a2e59) from Async(default) enqueued at 2026-11-27T10:12:36.177146000Z
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59]   [1m[36mMcpServer Load (1.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59]   [1m[36mMcpServer Update (1.1ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:12:36.290782' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59]   [1m[36mMcpServer Update (0.4ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:12:36.345331' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [15ce28be-5ee9-4a21-8f01-f1ef566a2e59] Performed RefreshToolsJob (Job ID: 15ce28be-5ee9-4a21-8f01-f1ef566a2e59) from Async(default) in 162.95ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300008ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 2.3ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:47:03 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:d4af7604-9ee7-f625-25b0-64a850548c1d
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 466cd795-d6ab-4248-b559-8e429906b21b) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b] Performing RefreshToolsJob (Job ID: 466cd795-d6ab-4248-b559-8e429906b21b) from Async(default) enqueued at 2026-11-27T10:17:36.184511000Z
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b]   [1m[36mMcpServer Load (0.5ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b]   [1m[36mMcpServer Update (2.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:17:36.283354' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b]   [1m[36mMcpServer Update (0.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:17:36.344967' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [466cd795-d6ab-4248-b559-8e429906b21b] Performed RefreshToolsJob (Job ID: 466cd795-d6ab-4248-b559-8e429906b21b) from Async(default) in 156.82ms
+Started POST "/mcp" for ::1 at 2026-11-27 15:50:54 +0530
+Processing by McpController#create as JSON
+  Parameters: {"method" => "tools/call", "params" => {"name" => "orders__get_order", "arguments" => {"order_id" => "ORD-1001"}, "_meta" => {"claudecode/toolUseId" => "call-90cde4e4-dabb-477a-ad02-5f4d398c7fee", "progressToken" => "[FILTERED]"}}, "jsonrpc" => "2.0", "id" => 3, "mcp" => {"method" => "tools/call", "params" => {"name" => "orders__get_order", "arguments" => {"order_id" => "ORD-1001"}, "_meta" => {"claudecode/toolUseId" => "call-90cde4e4-dabb-477a-ad02-5f4d398c7fee", "progressToken" => "[FILTERED]"}}, "jsonrpc" => "2.0", "id" => 3}}
+  [1m[36mMcpServer Load (0.2ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."name" = 'orders' LIMIT 1 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/tool_catalog.rb:89:in 'ToolCatalog.resolve'
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:d4af7604-9ee7-f625-25b0-64a850548c1d
+  [1m[36mCACHE McpServer Load (0.0ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE AND "mcp_servers"."name" = 'orders' LIMIT 1[0m
+  ↳ app/services/tool_catalog.rb:89:in 'ToolCatalog.resolve'
+  [1m[36mToolPolicy Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "tool_policies" WHERE "tool_policies"."mcp_server_id" = 2 AND "tool_policies"."tool_name" = 'get_order' AND "tool_policies"."enabled" = FALSE LIMIT 1 /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/models/mcp_server.rb:40:in 'McpServer#tool_enabled?'
+  [1m[36mTRANSACTION (0.0ms)[0m  [1m[35mBEGIN immediate TRANSACTION /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/gateway_rpc.rb:143:in 'GatewayRpc#log_call'
+  [1m[36mCallLog Create (1.1ms)[0m  [1m[32mINSERT INTO "call_logs" ("mcp_server_id", "tool_name", "gateway_token_id", "status", "duration_ms", "error", "created_at") VALUES (2, 'get_order', NULL, 'ok', 65, NULL, '2026-11-27 10:20:54.224744') RETURNING "id" /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/gateway_rpc.rb:143:in 'GatewayRpc#log_call'
+  [1m[36mTRANSACTION (0.3ms)[0m  [1m[35mCOMMIT TRANSACTION /*action='create',application='McpGateway',controller='mcp'*/[0m
+  ↳ app/services/gateway_rpc.rb:143:in 'GatewayRpc#log_call'
+Completed 200 OK in 101ms (Views: 0.1ms | ActiveRecord: 2.2ms (4 queries, 1 cached) | GC: 1.5ms)
+
+
+Started GET "/mcp_servers/2/edit" for ::1 at 2026-11-27 15:51:54 +0530
+Processing by McpServersController#edit as HTML
+  Parameters: {"id" => "2"}
+  [1m[36mUser Load (0.0ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 1 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/application_controller.rb:9:in 'ApplicationController#current_user'
+  [1m[36mMcpServer Load (0.1ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."id" = 2 LIMIT 1 /*action='edit',application='McpGateway',controller='mcp_servers'*/[0m
+  ↳ app/controllers/mcp_servers_controller.rb:69:in 'McpServersController#set_server'
+  Rendering layout layouts/application.html.erb
+  Rendering mcp_servers/edit.html.erb within layouts/application
+  Rendered mcp_servers/_form.html.erb (Duration: 9.3ms | GC: 0.0ms)
+  Rendered mcp_servers/edit.html.erb within layouts/application (Duration: 10.1ms | GC: 0.0ms)
+  Rendered shared/_head_assets.html.erb (Duration: 6.8ms | GC: 0.0ms)
+  Rendered shared/_flash.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 18.8ms | GC: 0.0ms)
+Completed 200 OK in 57ms (Views: 23.4ms | ActiveRecord: 0.4ms (2 queries, 0 cached) | GC: 0.0ms)
+
+
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300004ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 4.5ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:52:05 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:6fa58108-b10a-3dbd-37cf-08befe90eb84
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 36c2cd4d-12ed-4745-b3ca-6158ad2ae012) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012] Performing RefreshToolsJob (Job ID: 36c2cd4d-12ed-4745-b3ca-6158ad2ae012) from Async(default) enqueued at 2026-11-27T10:22:36.192911000Z
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012]   [1m[36mMcpServer Load (0.3ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012]   [1m[36mMcpServer Update (1.6ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:22:36.283252' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012]   [1m[36mMcpServer Update (0.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:22:36.362727' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [36c2cd4d-12ed-4745-b3ca-6158ad2ae012] Performed RefreshToolsJob (Job ID: 36c2cd4d-12ed-4745-b3ca-6158ad2ae012) from Async(default) in 167.16ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300007ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 15:57:06 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:a040c599-962a-6ef5-de92-0e2fed9b81ec
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 56f7b47a-52fd-4970-931e-f00b614e012c) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c] Performing RefreshToolsJob (Job ID: 56f7b47a-52fd-4970-931e-f00b614e012c) from Async(default) enqueued at 2026-11-27T10:27:36.200953000Z
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c]   [1m[36mMcpServer Load (0.7ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c]   [1m[36mMcpServer Update (1.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:27:36.359532' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c]   [1m[36mMcpServer Update (0.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:27:36.429144' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [56f7b47a-52fd-4970-931e-f00b614e012c] Performed RefreshToolsJob (Job ID: 56f7b47a-52fd-4970-931e-f00b614e012c) from Async(default) in 225.17ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300005ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 45.1ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 16:02:07 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:092853fd-e60b-acd9-9a20-74f2c44abdcf
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: a9ebdcfe-604c-4a16-8539-7056a3a8c55d) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d] Performing RefreshToolsJob (Job ID: a9ebdcfe-604c-4a16-8539-7056a3a8c55d) from Async(default) enqueued at 2026-11-27T10:32:36.205697000Z
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d]   [1m[36mMcpServer Load (0.4ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d]   [1m[36mMcpServer Update (0.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:32:36.278916' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d]   [1m[36mMcpServer Update (0.4ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:32:36.320993' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [a9ebdcfe-604c-4a16-8539-7056a3a8c55d] Performed RefreshToolsJob (Job ID: a9ebdcfe-604c-4a16-8539-7056a3a8c55d) from Async(default) in 110.33ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300004ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 3.1ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 16:07:09 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:4684ac33-4663-23da-edb5-3e71b3b19264
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 1502e339-a7cc-4e7d-bff2-f588347b2d24) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24] Performing RefreshToolsJob (Job ID: 1502e339-a7cc-4e7d-bff2-f588347b2d24) from Async(default) enqueued at 2026-11-27T10:37:36.213426000Z
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24]   [1m[36mMcpServer Load (0.6ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24]   [1m[36mMcpServer Update (1.6ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:37:36.312251' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24]   [1m[36mMcpServer Update (0.6ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:37:36.359770' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [1502e339-a7cc-4e7d-bff2-f588347b2d24] Performed RefreshToolsJob (Job ID: 1502e339-a7cc-4e7d-bff2-f588347b2d24) from Async(default) in 138.68ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300015ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 1.2ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 16:12:10 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:6ca91a6e-03e4-cf1d-ab86-2e4dd702a376
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 8b084de6-833c-4bdb-8744-7f539f5ccc98) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98] Performing RefreshToolsJob (Job ID: 8b084de6-833c-4bdb-8744-7f539f5ccc98) from Async(default) enqueued at 2026-11-27T10:42:36.223731000Z
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98]   [1m[36mMcpServer Load (0.6ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98]   [1m[36mMcpServer Update (2.1ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:42:36.351644' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98]   [1m[36mMcpServer Update (0.6ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:42:36.402977' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [8b084de6-833c-4bdb-8744-7f539f5ccc98] Performed RefreshToolsJob (Job ID: 8b084de6-833c-4bdb-8744-7f539f5ccc98) from Async(default) in 171.34ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300006ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 2.8ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 16:17:11 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:217683ab-c2ce-c448-7d40-6b4bb00942f7
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: c14ac0cf-4db8-4e7c-8dd8-25890d3d7056) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056] Performing RefreshToolsJob (Job ID: c14ac0cf-4db8-4e7c-8dd8-25890d3d7056) from Async(default) enqueued at 2026-11-27T10:47:36.237356000Z
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056]   [1m[36mMcpServer Load (0.7ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056]   [1m[36mMcpServer Update (1.5ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:47:36.328086' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056]   [1m[36mMcpServer Update (0.6ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:47:36.382322' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [c14ac0cf-4db8-4e7c-8dd8-25890d3d7056] Performed RefreshToolsJob (Job ID: c14ac0cf-4db8-4e7c-8dd8-25890d3d7056) from Async(default) in 138.53ms
+[mcp-gateway] SSE stream closed after 300s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed 200 OK in 300010ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 3.8ms)
+
+
+Started GET "/mcp" for ::1 at 2026-11-27 16:22:13 +0530
+Processing by McpStreamController#show as */*
+[oidc] authenticated sub=c397936c-a9cb-4756-80c7-b5189264a4a4 jti=ofrtrt:138fc171-9bba-474f-bd89-7bd0cb33fb01
+[mcp-gateway] SSE stream opened caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4 open_streams=1
+[ActiveJob] Enqueued RefreshToolsJob (Job ID: 796680de-4029-4951-a5d7-2d7688c2b20b) to Async(default)
+[ActiveJob] ↳ config/initializers/scheduler.rb:14:in 'block (3 levels) in <main>'
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b] Performing RefreshToolsJob (Job ID: 796680de-4029-4951-a5d7-2d7688c2b20b) from Async(default) enqueued at 2026-11-27T10:52:36.245211000Z
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b]   [1m[36mMcpServer Load (0.5ms)[0m  [1m[34mSELECT "mcp_servers".* FROM "mcp_servers" WHERE "mcp_servers"."enabled" = TRUE ORDER BY "mcp_servers"."id" ASC LIMIT 1000 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b]   ↳ app/jobs/refresh_tools_job.rb:7:in 'RefreshToolsJob#perform'
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b]   [1m[36mMcpServer Update (0.9ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"get_order","description":"Get an order (customer, items, total and current status) by its order id, e.g. ORD-1001.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":true}},{"name":"create_order","description":"Create a new order for a customer with one or more line items. The order starts in ''pending'' status; the total is calculated from the items. Returns the new order including its generated order id.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"customer":{"type":"string","description":"Customer name"},"items":{"type":"array","minItems":1,"description":"Line items","items":{"type":"object","properties":{"sku":{"type":"string","description":"Product SKU"},"name":{"type":"string","description":"Product name (defaults to the SKU)"},"qty":{"type":"integer","minimum":1,"description":"Quantity"},"price":{"type":"number","minimum":0,"description":"Unit price"}},"required":["sku","qty","price"]}},"currency":{"type":"string","description":"ISO currency code, default USD"}},"required":["customer","items"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}},{"name":"update_order","description":"Update the status of an order. Allowed statuses: pending, paid, processing, shipped, delivered, cancelled. Transitions are validated (e.g. a delivered order cannot be changed).","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"status":{"type":"string","enum":["pending","paid","processing","shipped","delivered","cancelled"],"description":"New status"}},"required":["order_id","status"],"type":"object"},"annotations":{"destructiveHint":false,"idempotentHint":true,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 3, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:52:36.317862' WHERE "mcp_servers"."id" = 2 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b]   [1m[36mMcpServer Update (0.3ms)[0m  [1m[33mUPDATE "mcp_servers" SET "tools_cache" = '[{"name":"initiate_refund","description":"Initiate a full refund for the captured payment of an order. Fails if the order has no payment, the payment is not captured, or it was already refunded.","inputSchema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"order_id":{"type":"string","description":"Order id, e.g. ORD-1001"},"reason":{"type":"string","description":"Optional reason for the refund"}},"required":["order_id"],"type":"object"},"annotations":{"destructiveHint":true,"idempotentHint":false,"openWorldHint":false,"readOnlyHint":false}}]', "tools_count" = 1, "last_status" = 'ok', "last_error" = NULL, "last_checked_at" = '2026-11-27 10:52:36.365247' WHERE "mcp_servers"."id" = 3 /*application='McpGateway',job='RefreshToolsJob'*/[0m
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b]   ↳ app/models/mcp_server.rb:84:in 'McpServer#refresh_tools!'
+[ActiveJob] [RefreshToolsJob] [796680de-4029-4951-a5d7-2d7688c2b20b] Performed RefreshToolsJob (Job ID: 796680de-4029-4951-a5d7-2d7688c2b20b) from Async(default) in 112.48ms
+[mcp-gateway] SSE stream closed after 270s (max lifetime reached) caller=sub:c397936c-a9cb-4756-80c7-b5189264a4a4
+Completed   in 270080ms (ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 3.0ms)
+
+

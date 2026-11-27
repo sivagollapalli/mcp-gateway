@@ -72,7 +72,10 @@ class UpdateOrder < MCP::Tool
   end
 end
 
-APP = ServerApp.build(name: "orders", tools: [GetOrder, CreateOrder, UpdateOrder],
+# Scopes this server itself requires (independent of the gateway).
+TOOL_SCOPES = { "get_order" => "orders:read", "create_order" => "orders:write", "update_order" => "orders:write" }.freeze
+
+APP = ServerApp.build(name: "orders", tool_scopes: TOOL_SCOPES, tools: [GetOrder, CreateOrder, UpdateOrder],
                       instructions: "E-commerce orders service: create, look up and update orders.")
 
 ServerApp.run(APP, default_port: 9301) if $PROGRAM_NAME == __FILE__

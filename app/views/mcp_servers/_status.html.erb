@@ -1,5 +1,11 @@
 <div id="<%= dom_id(server, :status) %>" class="mb-3">
   <%= status_badge(server.last_status) %>
   <span class="ms-2 small text-secondary">checked <%= time_ago_or_dash(server.last_checked_at) %> · <%= server.enabled? ? "enabled" : "disabled" %> · auth: <%= server.auth_type %></span>
+  <% if server.token_exchange? %>
+    <div class="small text-secondary mt-1">
+      token exchange: <code><%= server.effective_exchange_issuer %></code> · client <code><%= server.effective_exchange_client_id %></code>
+      · aud <code><%= server.exchange_audience %></code><% if server.exchange_scope.present? %> · always <code><%= server.exchange_scope %></code><% end %>
+    </div>
+  <% end %>
   <% if server.last_error.present? %><div class="alert alert-danger mt-2 mb-0 py-2"><%= server.last_error %></div><% end %>
 </div>

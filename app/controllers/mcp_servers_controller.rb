@@ -27,6 +27,7 @@ class McpServersController < ApplicationController
   def update
     attrs = server_params
     attrs = attrs.except(:auth_token) if attrs[:auth_token].blank? # blank keeps the stored secret
+    attrs = attrs.except(:exchange_client_secret) if attrs[:exchange_client_secret].blank?
     if @server.update(attrs)
       redirect_to @server, notice: "Server updated."
     else
@@ -69,6 +70,8 @@ class McpServersController < ApplicationController
   end
 
   def server_params
-    params.expect(mcp_server: %i[name url auth_type auth_token enabled description])
+    params.expect(mcp_server: %i[name url auth_type auth_token enabled description
+                                 exchange_issuer exchange_client_id exchange_client_secret exchange_audience
+                                 exchange_scope default_tool_scope tool_scopes_text])
   end
 end

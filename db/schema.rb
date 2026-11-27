@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_01_01_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_27_000001) do
   create_table "call_logs", force: :cascade do |t|
     t.integer "mcp_server_id"
     t.string "tool_name"
@@ -50,6 +50,13 @@ ActiveRecord::Schema[8.1].define(version: 2025_01_01_000001) do
     t.json "tools_cache"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "exchange_issuer"
+    t.string "exchange_client_id"
+    t.text "exchange_client_secret"
+    t.string "exchange_audience"
+    t.string "exchange_scope"
+    t.string "default_tool_scope"
+    t.json "tool_scopes"
     t.index ["name"], name: "index_mcp_servers_on_name", unique: true
   end
 

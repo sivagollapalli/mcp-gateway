@@ -32,13 +32,18 @@ class UpstreamMcp
 
   attr_reader :session_id
 
-  def initialize(server)
+  # bearer_token: the exchanged, audience-bound token for token_exchange servers. Headers are
+  # always built from scratch here; nothing from the inbound client request is copied.
+  def initialize(server, bearer_token: nil)
     @server = server
+    @bearer_token = bearer_token
     @uri = URI.parse(server.url)
     @session_id = nil
     @initialized = false
     @next_id = 0
   end
+
+  def inspect = "#<UpstreamMcp server=#{@server.name}>" # never expose credentials
 
   def initialize!
     result = request("initialize", {
@@ -161,6 +166,9 @@ class UpstreamMcp
     h["MCP-Protocol-Version"] = PROTOCOL_VERSION if @initialized
     case @server.auth_type
     when "bearer" then h["Authorization"] = "Bearer #{@server.auth_token}"
+    when "token_exchange"
+      raise AuthError, "No exchanged token for #{@server.name}; refusing to call it unauthenticated" if @bearer_token.blank?
+      h["Authorization"] = "Bearer #{@bearer_token}"
     when "header"
       # auth_token holds a full "Header-Name: value" pair
       name, value = @server.auth_token.to_s.split(":", 2)

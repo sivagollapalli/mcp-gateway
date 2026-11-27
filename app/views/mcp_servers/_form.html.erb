@@ -22,8 +22,51 @@
       <%= f.label :auth_token, "Secret", class: "form-label" %>
       <%= f.password_field :auth_token, class: "form-control", value: "", autocomplete: "off",
             placeholder: (server.persisted? && server.auth_token.present? ? "•••••• (leave blank to keep)" : "") %>
-      <div class="form-text">For <code>bearer</code>: the token. For <code>header</code>: a full <code>Header-Name: value</code> pair. Stored encrypted.</div>
+      <div class="form-text">For <code>bearer</code>: the token. For <code>header</code>: a full <code>Header-Name: value</code> pair. Stored encrypted. Not used for <code>token_exchange</code>.</div>
     </div>
+    <fieldset class="col-12 border rounded p-3" aria-describedby="tx-help">
+      <legend class="fs-6 fw-semibold float-none w-auto px-1 mb-0">OAuth token exchange (RFC 8693)</legend>
+      <div id="tx-help" class="form-text mb-2">
+        Used when Authentication is <code>token_exchange</code>. For each tool call the gateway exchanges the caller's
+        Keycloak token for a short-lived token whose <code>aud</code> is exactly the audience below and forwards only that.
+      </div>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <%= f.label :exchange_issuer, "Token exchange server (OIDC issuer)", class: "form-label" %>
+          <%= f.url_field :exchange_issuer, class: "form-control", placeholder: Oidc.config.issuer.presence || "https://auth.example.com/realms/myapp" %>
+          <div class="form-text">Blank uses <code>KEYCLOAK_ISSUER</code>. The token endpoint is discovered from <code>/.well-known/openid-configuration</code>.</div>
+        </div>
+        <div class="col-md-3">
+          <%= f.label :exchange_client_id, "Client ID", class: "form-label" %>
+          <%= f.text_field :exchange_client_id, class: "form-control", placeholder: ENV.fetch("GATEWAY_CLIENT_ID", "mcp-gateway") %>
+        </div>
+        <div class="col-md-3">
+          <%= f.label :exchange_client_secret, "Client secret", class: "form-label" %>
+          <%= f.password_field :exchange_client_secret, class: "form-control", value: "", autocomplete: "off",
+                placeholder: (server.persisted? && server.exchange_client_secret.present? ? "•••••• (leave blank to keep)" : "blank = GATEWAY_CLIENT_SECRET") %>
+        </div>
+        <div class="col-md-4">
+          <%= f.label :exchange_audience, "Audience", class: "form-label" %>
+          <%= f.text_field :exchange_audience, class: "form-control", placeholder: "mcp-orders" %>
+          <div class="form-text">The upstream accepts only tokens with exactly this <code>aud</code>.</div>
+        </div>
+        <div class="col-md-4">
+          <%= f.label :exchange_scope, "Always-requested scopes", class: "form-label" %>
+          <%= f.text_field :exchange_scope, class: "form-control", placeholder: "mcp-orders-audience" %>
+          <div class="form-text">Space-separated, e.g. the client scope that adds the audience. Also used for tool discovery.</div>
+        </div>
+        <div class="col-md-4">
+          <%= f.label :default_tool_scope, "Default tool scope", class: "form-label" %>
+          <%= f.text_field :default_tool_scope, class: "form-control", placeholder: "orders:read" %>
+          <div class="form-text">Required for tools without an entry below.</div>
+        </div>
+        <div class="col-12">
+          <%= f.label :tool_scopes_text, "Per-tool scopes", class: "form-label" %>
+          <%= f.text_area :tool_scopes_text, rows: 3, class: "form-control font-monospace", placeholder: "create_order=orders:write\nupdate_order=orders:write" %>
+          <div class="form-text">One <code>upstream_tool_name=scope</code> per line. The caller's token must contain the scope; it is also requested in the exchange.</div>
+        </div>
+      </div>
+    </fieldset>
     <div class="col-12">
       <%= f.label :description, class: "form-label" %>
       <%= f.text_area :description, rows: 2, class: "form-control" %>

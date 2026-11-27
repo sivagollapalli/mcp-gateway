@@ -19,9 +19,10 @@ class GatewayRpc
     "inputSchema" => { "type" => "object", "properties" => {}, "additionalProperties" => false }
   }.freeze
 
-  def initialize(gateway_token: nil, principal: nil)
+  def initialize(gateway_token: nil, principal: nil, subject_token: nil)
     @token = gateway_token
     @principal = principal # Oidc::Principal when authenticated via Keycloak
+    @subject_token = subject_token # TokenExchange::Secret; only ever sent to the token exchange server
   end
 
   # raw: request body string. Returns Result(status, body-hash-or-nil).
@@ -94,7 +95,16 @@ class GatewayRpc
 
     started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     begin
-      result = UpstreamMcp.new(server).call_tool(tool["name"], arguments)
+      bearer = nil
+      if server.token_exchange?
+        denial = exchange_denial(server, tool["name"])
+        if denial
+          log_call(server, tool["name"], "error", started, denial)
+          return error_result(denial)
+        end
+        bearer = TokenExchange.exchange_for_tool(server, @subject_token, tool["name"])
+      end
+      result = UpstreamMcp.new(server, bearer_token: bearer).call_tool(tool["name"], arguments)
       log_call(server, tool["name"], result["isError"] ? "error" : "ok", started, result["isError"] ? "Upstream tool reported isError" : nil)
       limit_size(result)
     rescue UpstreamMcp::RpcError => e
@@ -103,7 +113,20 @@ class GatewayRpc
     rescue UpstreamMcp::Error => e
       log_call(server, tool["name"], "error", started, "#{e.class.name.demodulize}: #{e.message}")
       error_result("Upstream call failed: #{e.message}")
+    rescue TokenExchange::Error => e
+      log_call(server, tool["name"], "error", started, "TokenExchange #{e.class.name.demodulize}: #{e.message}")
+      error_result("Token exchange for #{server.name} failed; the tool was not called.")
     end
+  end
+
+  # Fail closed: token-exchange upstreams need a validated Keycloak caller holding the tool scope.
+  # (The controller already returns 403 for a missing scope; this is the second line of defense.)
+  def exchange_denial(server, tool_name)
+    return "#{server.name} requires a Keycloak sign-in (OIDC mode)" unless @principal && @subject_token
+    required = server.required_scope_for(tool_name)
+    return "No scope configured for #{tool_name}" unless required
+    return "Missing scope #{required}" unless @principal.scopes.include?(required)
+    nil
   end
 
   def whoami

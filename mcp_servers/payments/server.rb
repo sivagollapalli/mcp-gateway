@@ -21,7 +21,10 @@ class InitiateRefund < MCP::Tool
   end
 end
 
-APP = ServerApp.build(name: "payments", tools: [InitiateRefund],
+# Scopes this server itself requires (independent of the gateway).
+TOOL_SCOPES = { "initiate_refund" => "payments:refund" }.freeze
+
+APP = ServerApp.build(name: "payments", tool_scopes: TOOL_SCOPES, tools: [InitiateRefund],
                       instructions: "E-commerce payments service: initiate refunds for orders.")
 
 ServerApp.run(APP, default_port: 9302) if $PROGRAM_NAME == __FILE__

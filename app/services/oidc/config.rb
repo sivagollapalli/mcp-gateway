@@ -55,8 +55,9 @@ module Oidc
     # e.g. KEYCLOAK_INTERNAL_URL=http://keycloak:8080 replaces http://localhost:8080.
     # Only the fetch URL is rewritten; the advertised endpoints stay verbatim.
     def fetch_url(url)
+      return url unless internal_url && issuer
       origin = issuer_origin
-      return url unless internal_url && origin && url.start_with?("#{origin}/")
+      return url unless origin && url.start_with?("#{origin}/")
       "#{internal_url}#{url.delete_prefix(origin)}"
     end
 
