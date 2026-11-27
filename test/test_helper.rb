@@ -4,12 +4,17 @@ require "rails/test_help"
 require "webmock/minitest"
 
 WebMock.disable_net_connect!
+require_relative "support/oidc_helper"
 
 module ActiveSupport
   class TestCase
     parallelize(workers: :number_of_processors)
 
+    include OidcHelper
+
     setup do
+      Oidc.reset!
+      Oidc.config = Oidc::Config.new # OIDC off unless a test installs it (ignore the developer's ENV)
       Rails.cache.clear
       # Pretend every hostname resolves to a public address (no real DNS in tests).
       UpstreamMcp.resolver = ->(_host) { [ "93.184.216.34" ] }

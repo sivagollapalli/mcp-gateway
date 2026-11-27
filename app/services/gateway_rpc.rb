@@ -13,8 +13,15 @@ class GatewayRpc
     { jsonrpc: "2.0", id: id, error: { code: code, message: message } }
   end
 
-  def initialize(gateway_token:)
+  WHOAMI_TOOL = {
+    "name" => "whoami",
+    "description" => "Returns the authenticated caller's subject (sub) and granted scopes.",
+    "inputSchema" => { "type" => "object", "properties" => {}, "additionalProperties" => false }
+  }.freeze
+
+  def initialize(gateway_token: nil, principal: nil)
     @token = gateway_token
+    @principal = principal # Oidc::Principal when authenticated via Keycloak
   end
 
   # raw: request body string. Returns Result(status, body-hash-or-nil).
@@ -55,7 +62,7 @@ class GatewayRpc
     case method
     when "initialize" then initialize_result(params)
     when "ping" then {}
-    when "tools/list" then { tools: ToolCatalog.tools }
+    when "tools/list" then { tools: (@principal ? [ WHOAMI_TOOL ] : []) + ToolCatalog.tools }
     when "tools/call" then call_tool(params)
     else [ METHOD_NOT_FOUND, "Method not found: #{method}" ]
     end
@@ -77,6 +84,8 @@ class GatewayRpc
     arguments = {} if arguments.nil?
     return [ INVALID_PARAMS, "arguments must be an object" ] unless arguments.is_a?(Hash)
 
+    return whoami if @principal && name == WHOAMI_TOOL["name"]
+
     server, tool = ToolCatalog.resolve(name)
     return [ INVALID_PARAMS, "Unknown tool: #{name}" ] unless server
     unless server.tool_enabled?(tool["name"])
@@ -95,6 +104,11 @@ class GatewayRpc
       log_call(server, tool["name"], "error", started, "#{e.class.name.demodulize}: #{e.message}")
       error_result("Upstream call failed: #{e.message}")
     end
+  end
+
+  def whoami
+    payload = { sub: @principal.sub, scopes: @principal.scopes }
+    { content: [ { type: "text", text: JSON.generate(payload) } ], structuredContent: payload, isError: false }
   end
 
   def error_result(text)

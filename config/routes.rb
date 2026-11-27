@@ -5,6 +5,12 @@ Rails.application.routes.draw do
   post "/mcp", to: "mcp#create"
   get "/mcp", to: "mcp_stream#show"
 
+  # OAuth discovery (RFC 9728 / RFC 8414). The /mcp-suffixed variants are the path-aware forms.
+  get "/.well-known/oauth-protected-resource", to: "well_known#protected_resource"
+  get "/.well-known/oauth-protected-resource/mcp", to: "well_known#protected_resource"
+  get "/.well-known/oauth-authorization-server", to: "well_known#authorization_server"
+  get "/.well-known/oauth-authorization-server/mcp", to: "well_known#authorization_server"
+
   # Admin UI
   root "dashboard#show"
   resource :session, only: %i[new create destroy]

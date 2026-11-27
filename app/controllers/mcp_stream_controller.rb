@@ -29,7 +29,7 @@ class McpStreamController < ActionController::API
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + Rails.configuration.x.gateway.stream_max_seconds
     opened = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     reason = "max lifetime reached"
-    Rails.logger.info("[mcp-gateway] SSE stream opened token=#{@gateway_token.name.inspect} open_streams=#{ToolsChangedBroadcaster.subscriber_count}")
+    Rails.logger.info("[mcp-gateway] SSE stream opened caller=#{caller_label} open_streams=#{ToolsChangedBroadcaster.subscriber_count}")
     response.stream.write(": connected\n\n")
     loop do
       remaining = deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -39,7 +39,7 @@ class McpStreamController < ActionController::API
       if event
         queue.clear # coalesce bursts into one notification
         response.stream.write("event: message\ndata: #{JSON.generate(NOTIFICATION)}\n\n")
-        Rails.logger.info("[mcp-gateway] sent notifications/tools/list_changed to token=#{@gateway_token.name.inspect}")
+        Rails.logger.info("[mcp-gateway] sent notifications/tools/list_changed to caller=#{caller_label}")
       else
         response.stream.write(": keepalive\n\n")
       end
@@ -49,9 +49,15 @@ class McpStreamController < ActionController::API
   ensure
     if queue
       secs = opened ? (Process.clock_gettime(Process::CLOCK_MONOTONIC) - opened).round : 0
-      Rails.logger.info("[mcp-gateway] SSE stream closed after #{secs}s (#{reason || 'error'}) token=#{@gateway_token&.name.inspect}")
+      Rails.logger.info("[mcp-gateway] SSE stream closed after #{secs}s (#{reason || 'error'}) caller=#{caller_label}")
     end
     ToolsChangedBroadcaster.unsubscribe(queue) if queue
     response.stream.close
+  end
+
+  private
+
+  def caller_label
+    @principal ? "sub:#{@principal.sub}" : @gateway_token&.name.inspect
   end
 end

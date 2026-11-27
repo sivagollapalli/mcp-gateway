@@ -1,0 +1,53 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Fixed frontend URL => issuer is always exactly http://localhost:8080/realms/mcp,
+      # no matter which host name (localhost or keycloak) a request arrives on.
+      KC_HOSTNAME: http://localhost:${KEYCLOAK_PORT:-8080}
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
+    volumes:
+      - ./keycloak/realm-mcp.json:/opt/keycloak/data/import/realm-mcp.json:ro
+    healthcheck:
+      # The Keycloak image has no curl; talk HTTP to the management port (9000) with bash.
+      test:
+        - CMD-SHELL
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          grep -q '"status": "UP"' <&3
+      interval: 5s
+      timeout: 5s
+      retries: 40
+      start_period: 20s
+
+  gateway:
+    build: .
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: on-failure
+    ports:
+      - "${GATEWAY_PORT:-8081}:3000"
+    environment:
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-dev-only-insecure-secret-key-base-change-me-0123456789abcdef0123456789abcdef}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost:${KEYCLOAK_PORT:-8080}/realms/mcp}
+      # Inside the compose network "localhost" is the gateway container itself, so the
+      # discovery/JWKS fetches go to the keycloak service. Advertised URLs are unchanged.
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+      GATEWAY_AUDIENCE: ${GATEWAY_AUDIENCE:-mcp-gateway}
+      CLOCK_LEEWAY: ${CLOCK_LEEWAY:-30}
+      GATEWAY_PUBLIC_URL: ${GATEWAY_PUBLIC_URL:-http://localhost:${GATEWAY_PORT:-8081}}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme-dev-password}
+    volumes:
+      - gateway-storage:/rails/storage
+
+volumes:
+  gateway-storage:

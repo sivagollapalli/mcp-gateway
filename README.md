@@ -106,3 +106,65 @@ docker run -p 3000:3000 -e RAILS_MASTER_KEY=... -e ADMIN_EMAIL=... -e ADMIN_PASS
 ```
 
 (Dockerfile build not verified in this environment.) Production forces SSL; terminate TLS at a proxy.
+
+## OIDC authentication with Keycloak (user leg)
+Setting `KEYCLOAK_ISSUER` switches `/mcp` from static gateway tokens to **OAuth 2.0 / OIDC bearer JWTs issued by Keycloak** (Authorization Code + PKCE S256, clients register themselves via RFC 7591). Without it, the static-token behaviour described above is unchanged. The gateway→upstream auth leg is not part of this work.
+
+### Run it
+```sh
+docker compose up --build      # Keycloak on :8080 (realm `mcp` imported), gateway on :8081
+claude mcp add --transport http mcp-gateway http://localhost:8081/mcp
+```
+Then in Claude Code run `/mcp`, pick `mcp-gateway`, choose **Login**. The browser opens Keycloak; sign in as `test-user` / `test-password`, accept the consent screen, and call the `whoami` tool: it returns your `sub` and granted scopes.
+
+Keycloak admin console: http://localhost:8080 (`admin` / `admin`, dev only). If port 8080 or 8081 is taken, set `KEYCLOAK_PORT` / `GATEWAY_PORT` (the issuer and public URL follow automatically).
+
+`script/oidc_e2e.py [gateway_url] [scopes]` replays the whole flow without a browser (discovery, DCR, PKCE, login, consent, token, `whoami`) and checks that an authorization request without PKCE is refused.
+
+### Environment (see `.env.example`)
+| Variable | Default | Purpose |
+|---|---|---|
+| `KEYCLOAK_ISSUER` | unset (OIDC off) | Exact issuer, e.g. `http://localhost:8080/realms/mcp`. No trailing slash. Plain `http` is only accepted for localhost |
+| `GATEWAY_AUDIENCE` | `mcp-gateway` | Required `aud` value |
+| `CLOCK_LEEWAY` | `30` | Seconds of tolerance for `exp` / `nbf` (0-300) |
+| `GATEWAY_PUBLIC_URL` | required in OIDC mode | Public base URL; becomes `resource` (`<url>/mcp`) in the protected-resource metadata and the `resource_metadata` challenge |
+| `KEYCLOAK_INTERNAL_URL` | unset | Origin used to *fetch* discovery and JWKS when the issuer host is not reachable from the gateway (compose sets `http://keycloak:8080`). Advertised endpoints are not rewritten |
+| `JWKS_MIN_REFETCH_INTERVAL` | `10` | Minimum seconds between JWKS refetches caused by unknown `kid`s |
+
+### What the gateway does
+* **Startup**: fetches `{issuer}/.well-known/openid-configuration`, checks `issuer` equals `KEYCLOAK_ISSUER` byte for byte, fetches the JWKS and caches RS256 signing keys by `kid`. If either fetch fails the process exits (`rails server` only; tests, rake tasks and asset precompilation skip it, or force it with `OIDC_BOOT_CHECK=1`).
+* **Discovery**: `GET /.well-known/oauth-protected-resource` (RFC 9728, also under `/mcp`) lists Keycloak as `authorization_servers`. `GET /.well-known/oauth-authorization-server` (RFC 8414, also under `/mcp`) copies the authorize, token, registration and JWKS endpoints verbatim from the realm's discovery document.
+* **`POST /mcp` and `GET /mcp`** run this pipeline before any JSON-RPC handling:
+  1. `Authorization: Bearer <token>` is required, anything else is a 401.
+  2. Only `kid` and `alg` are read from the header. `alg` must be in the pinned list `["RS256"]` (`none`, `HS256`, `RS512`, lower-case variants are rejected). `crit` headers are rejected, `jwk`/`jku`/`x5u` are ignored.
+  3. `kid` is looked up in the cached JWKS. On a miss the JWKS is refetched once (rate limited) and the lookup repeated. Unknown means reject. An empty cache also rejects.
+  4. The RS256 signature is verified with the resolved key.
+  5. Claims: `iss` string-equal to the issuer; `aud` (string or array) contains exactly `mcp-gateway`; `exp` required, `nbf` checked, both with the leeway; `sub` and `jti` required; then scopes.
+  6. 401 `Bearer error="invalid_token"` for crypto/claim failures, 403 `Bearer error="insufficient_scope", scope="..."` when the token is valid but lacks scopes. A missing or non-bearer header gets a 401 without an `error` code (RFC 6750 section 3.1). All challenges carry `resource_metadata`.
+  7. On success `sub`, `scopes` and `jti` are attached to the request (`@principal`). Logs contain `sub` and `jti` only, never the token.
+* **Scopes**: every `/mcp` request needs `mcp:read`; `tools/call` (including `whoami`) also needs `mcp:tools:execute`.
+* **Tool `whoami`** is listed and callable for OIDC callers and returns `{ "sub": ..., "scopes": [...] }`.
+* No call to Keycloak happens per request (no introspection or userinfo). The only network calls are boot and the rate-limited refetch on an unknown `kid`. Tokens are never forwarded upstream.
+
+### Keycloak realm (`keycloak/realm-mcp.json`)
+Realm `mcp`; issuer `http://localhost:8080/realms/mcp` (pinned in compose with `KC_HOSTNAME`). Access tokens are RS256 with a 10 minute lifetime. Client scope `mcp-api` (realm default scope) has the audience mapper for `mcp-gateway`. `mcp:read` and `mcp:tools:execute` are realm *optional* scopes. Client policy `enforce-pkce-public-clients` applies the `pkce-enforcer` executor (auto-configure, S256) to every public client, which includes anonymously registered ones. Test user: `test-user` / `test-password`, with the realm's default roles. Claude Code requests `offline_access` (Keycloak advertises it), and the token exchange fails with "Offline tokens not allowed" if the user lacks that role.
+
+Dynamic Client Registration is **anonymous** for development (Trusted Hosts restricts redirect URIs to `localhost` / `127.0.0.1`, Consent Required is on). **For production switch to initial access tokens**: remove the `subType: anonymous` policies, create an initial access token in *Clients > Initial access token*, and give it to whoever registers clients. Also replace the dev admin password, set `sslRequired` to `external` or `all`, use HTTPS issuers, and set a real `SECRET_KEY_BASE`.
+
+### Decisions and deviations from the spec
+* **Existing Rails app, not a new service.** OIDC is added to this app. `/mcp` accepts *either* Keycloak JWTs (when `KEYCLOAK_ISSUER` is set) *or* the legacy static tokens (when it is not), never both, so the validation pipeline has a single entry path. In OIDC mode a static token gets a 401.
+* **No separate "scope" mapper.** Keycloak has no protocol mapper type for the `scope` claim; it writes the claim itself from the client scopes that have `include.in.token.scope=true`. `mcp-api`, `mcp:read` and `mcp:tools:execute` all set it. The audience mapper is the only mapper in `mcp-api`.
+* **The audience mapper is also on `mcp:read` and `mcp:tools:execute`.** Keycloak's anonymous registration gives a client only the scopes it asked for (plus `basic`), not the realm default scopes, when the request has a `scope` parameter (Claude Code sends one). Without the mapper on the `mcp:*` scopes those tokens would have no `aud` and be rejected. Any token with an `mcp:*` scope therefore carries `aud: mcp-gateway`.
+* **`aud` is the fixed string `mcp-gateway`, not the resource URL.** Clients still send RFC 8707 `resource=<gateway url>`; Keycloak ignores it for audience purposes and the mapper decides.
+* **`jti` and `sub` are required** in addition to the listed claims, so every accepted request can be logged by `jti` and `sub`.
+* **JWKS refetch on unknown `kid` is rate limited** (default one per 10 s) so forged `kid`s cannot be used to hammer Keycloak. A refetch that fails keeps the old keys.
+* **JWKS filtering**: only RSA keys with `use` `sig` (or unset), `alg` RS256 (or unset) and at least 2048 bits are loaded.
+* **Fetch origin override** (`KEYCLOAK_INTERNAL_URL`) exists because inside Docker `localhost:8080` is not Keycloak. Only the fetch is rewritten; issuer and advertised endpoints stay verbatim.
+* **Authorization-server metadata** advertises only `code` / `authorization_code` / `refresh_token`, `S256` and `none` client auth, narrower than Keycloak's own document. `scopes_supported` lists only the two `mcp:*` scopes.
+* **`mcp:read` must be granted.** Because it is an optional scope, clients that do not request it get a 403 `insufficient_scope` whose challenge names the scope, which MCP clients use to re-authorize. The protected-resource metadata lists both scopes so clients request them.
+* **Rate limiting** from the existing Rack::Attack setup still applies to `/mcp` (it keys on the Authorization header hash). No new rate limiting was added.
+* **Production database config**: `config/database.yml` had the production `database:` paths commented out, so the container could not boot. They now point at `storage/production*.sqlite3` (override with `DATABASE_URL` as before). This was needed for `docker compose up`.
+* **Compose ports** can be overridden (`KEYCLOAK_PORT`, `GATEWAY_PORT`); the defaults are the ones in the spec (8080, 8081).
+* The gateway runs the production image, so `docker compose` uses an insecure development `SECRET_KEY_BASE` unless you set one.
+* **Verified**: Claude Code `/mcp` → Authenticate → browser login → `whoami` returns `sub` and scopes, against Keycloak 26.4.7 under `docker compose`. `script/oidc_e2e.py` covers the same flow without a browser.
+* Out of scope and not built: gateway→upstream client credentials, token exchange, policy engine beyond scopes, new rate limiting, multi-tenancy, session resumption.
